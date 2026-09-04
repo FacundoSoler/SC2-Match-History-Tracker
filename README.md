@@ -16,10 +16,9 @@ A modern, responsive web application for searching, tracking, and analyzing Star
 - **Detailed Character Stats**:
   - Breakdown of performance over the **last 20 matches**.
   - Matchup distribution and win/loss breakdown against **Protoss**, **Zerg**, **Terran**, and **Random**.
-  - Custom animated win rate circular indicator (`v-progress-circular`).
 - **Match History Breakdown**:
-  - Inspect game outcomes (**WIN** / **LOSS**), duration, and map names (e.g., *Blackrock LE*, *Washout LE*, *Sanctuary III LE*).
-  - Real-time **MMR adjustments** (+/- ratings) for both Player 1 and Player 2.
+  - Inspect game outcomes (**WIN** / **LOSS**), duration, and map names.
+  - Real-time **MMR adjustments** (+/- ratings).
   - Detailed player name, BattleTag, and main race identifiers.
 - **Dark Theme UI**: Clean, high-contrast dark mode styled with **Vuetify**.
 
@@ -42,7 +41,7 @@ A modern, responsive web application for searching, tracking, and analyzing Star
 - [Node.js](https://nodejs.org/) (`v16.x` or higher recommended)
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
-### Installation
+### Installation - Part 1 (Web app)
 
 1. **Clone the repository:**
    ```bash
@@ -67,6 +66,23 @@ A modern, responsive web application for searching, tracking, and analyzing Star
    ```
 
 ---
+
+### Installation - Part 2 (NodeJS Server)
+
+1. **Open a new terminal window and navigate to the server folder from the project root:**
+      ```bash
+   cd src/server
+   ```
+      
+2. **Install server dependencies**
+     ```bash
+   npm install
+   ```
+     
+3. **Start the local NodeJS Server**
+     ```bash
+   node server.js
+   ```
 
 ## 📸 Screenshots
 
