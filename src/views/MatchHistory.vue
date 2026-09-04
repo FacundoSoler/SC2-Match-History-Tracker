@@ -1,15 +1,9 @@
 <template>
-    <!-- <router-link class="backButton" to="/">← Go Back to Character Search</router-link> -->
-
     <router-link to="/" class="back-link">
         <v-icon icon="mdi-arrow-left" size="18" class="back-icon" />
         <span>Character Search</span>
     </router-link>
 
-    <!-- <router-link to="/" class="back-link">
-        <span class="back-arrow" aria-hidden="true">←</span>
-        <span>Character Search</span>
-    </router-link> -->
     <div v-if="!isLoading" class="main-content">
         <div class="panels">
             <div class="stats">
@@ -112,14 +106,10 @@
                                 <td>{{ match.duration }}</td>
                                 <td>{{ match.map }}</td>
                                 <td :class="{
-                                    matchWon: match.players[0]?.name === charDetails.Tag
-                                        && match.players[0].decision === 'WIN' ||
-                                        match.players[1]?.name === charDetails.Tag
-                                        && match.players[1].decision === 'WIN',
-                                    matchLost: match.players[0]?.name === charDetails.Tag
-                                        && match.players[0].decision === 'LOSS' ||
-                                        match.players[1]?.name === charDetails.Tag
-                                        && match.players[1].decision === 'LOSS'
+                                    matchWon: match.players[0]?.displayName === charDetails.Name
+                                        && match.players[0].decision === 'WIN',
+                                    matchLost: match.players[0]?.displayName === charDetails.Name
+                                        && match.players[0].decision === 'LOSS'
                                 }">{{ setOutcome(match) }}
                                 </td>
                                 <td>
@@ -191,7 +181,6 @@ const currentWinRate = ref(0); // the actual value used in our circular progress
 
 onMounted(async () => {
     try {
-        console.log('Season Id : ', props.seasonId);
         isLoading.value = true;
         await loadCharacterDetails(props.characterId);
         await loadCharacterStats(props.characterId);
@@ -241,14 +230,14 @@ async function loadMatchHistory(characterId: string) {
     const data = await response.json();
     if (!data.result && !Array.isArray(data.result)) throw new Error('Error parsing SC2 Pulse Match History data');
 
-    parsedData.value = parsePulseMatches(data, { focalName: charDetails.value.Tag });
+    parsedData.value = parsePulseMatches(data, { focalName: charDetails.value.Name });
     console.log('Final parsing data output', parsedData.value);
 
     const characterName = parsedData.value.focalPlayer;
     sortedMatches.value = parsedData.value.matches.map((match: any) => ({
         ...match,
         players: [...match.players].sort((a, b) =>
-            a.name === characterName ? -1 : b.name === characterName ? 1 : 0
+            a.displayName === characterName ? -1 : b.displayName === characterName ? 1 : 0
         )
     }));
 
@@ -406,6 +395,7 @@ html {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     margin-top: 15px;
     margin-left: 15px;
 }
