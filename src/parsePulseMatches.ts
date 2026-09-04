@@ -229,13 +229,6 @@ function parsePulseMatches(payload, options = {}) {
 
     vsRace[race].total += 1;
     if (isWin(me.decision)) vsRace[race].wins += 1;
-
-    console.log({
-      matchId: row.match?.id || row.matchId,
-      n: parts.length,
-      races: parts.map((p) => p.race),
-      names: parts.map((p) => p.name),
-    });
   }
 
   for (const race of Object.keys(vsRace)) {

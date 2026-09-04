@@ -7,7 +7,7 @@ const router = createRouter({
   routes: [
     { path: "/", name: "search", component: CharacterSearch },
     {
-      path: "/matches/:characterId",
+      path: "/matches/:characterId/:seasonId",
       name: "matches",
       component: MatchHistory,
       props: true,

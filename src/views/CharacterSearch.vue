@@ -40,13 +40,14 @@
                                 <td>{{ character.currentStats.rating }}</td>
                                 <td>{{ character.currentStats.gamesPlayed }}</td>
                                 <td>
-                                    <router-link style="display: flex; align-items: center; gap: 6px;" class="matchHistoryLink" :to="{
-                                        name: 'matches',
-                                        params: { characterId: character.members.character.id }
-                                    }">
+                                    <router-link style="display: flex; align-items: center; gap: 6px;"
+                                        class="matchHistoryLink" :to="{
+                                            name: 'matches',
+                                            params: { characterId: character.members.character.id, seasonId: currentSeason }
+                                        }">
                                         <span style="display: flex;">
-                                            <img style="width: 12px;"
-                                                :src="setRaceIcon(character.members.raceGames)" width="15px">
+                                            <img style="width: 12px;" :src="setRaceIcon(character.members.raceGames)"
+                                                width="15px">
                                         </span>
                                         <span>
                                             {{ character.members.character.tag }} | {{
@@ -66,6 +67,7 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { SeasonDetails } from '../models/seasonDetails';
 
 defineOptions({ name: "CharacterSearch" });
 
@@ -75,16 +77,33 @@ let isLoading = ref(false);
 
 const battleNetProfile = ref('');
 const characterList = ref<any>(null);
+let currentSeason = ref(0);
 
-onMounted(() => {
-    console.log("Mounted !");
+onMounted(async () => {
+    await getSeasons();
 });
+
+async function getSeasons() {
+    try {
+        const url = `${API_BASE_URL}/seasons`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Error fetching Seasons data');
+
+        const data = await response.json();
+        if (!data || !Array.isArray(data)) throw new Error('Error parsing Seasons data');
+
+        const seasonDetails: SeasonDetails[] = data;
+        currentSeason.value = seasonDetails.sort((a,b) => b.battlenetId - a.battlenetId)[0]?.battlenetId;
+
+    } catch (error:any) {
+        console.error(error);
+    }
+}
 
 async function search() {
     try {
         isLoading.value = true;
 
-        // Fetch characters
         if (!battleNetProfile.value) return;
 
         const url = `${API_BASE_URL}/characterList?query=${battleNetProfile.value}`;
@@ -138,9 +157,6 @@ function setRaceIcon(raceGames: any) {
     const sortedRaceGames = Object.entries(mapRaceGames)
         .map(([race, games]) => ({ race, games }))
         .sort((a, b) => b.games - a.games);
-
-    console.log('MostPlayedRace', sortedRaceGames[0].race);
-    console.log('sortedRaceGames', sortedRaceGames);
 
     const mostPlayedRace = sortedRaceGames[0].race;
 

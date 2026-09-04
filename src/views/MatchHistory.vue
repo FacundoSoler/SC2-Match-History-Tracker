@@ -60,18 +60,39 @@
                     </table>
                 </div>
 
+                <!-- WIN RATE CIRCULAR PROGRESS STATS -->
                 <div class="winrate-block">
-                    <div class="winrate-title">Win rate</div>
+                    <div class="winrate-title">Main Race winrate</div>
 
                     <v-progress-circular :model-value="currentWinRate" :size="150" :width="15" color="primary">
-                        <div class="winrate-inner">
+                        <div class="winrate-inner winrate-inner-main"
+                            :style="{ backgroundImage: `url(${setRaceIcon(winrateMainRace?.raceGames.race)})` }">
                             <span class="winrate-value">{{ currentWinRate }}</span>
                             <span class="winrate-sub">%</span>
                         </div>
                     </v-progress-circular>
                 </div>
 
+                <div v-if="winrateOffRaces.length > 0" class="winrate-block-offraces-container">
+                    <div class="winrate-title">Off-Races winrates</div>
+
+                    <div class="winrate-block-offraces-items">
+                        <div v-for="stat in winrateOffRaces" :key="stat.raceGames.race">
+                            <v-progress-circular :model-value="stat.winratePercentage" :size="100" :width="12"
+                                color="primary">
+                                <div class="winrate-inner winrate-inner-offrace"
+                                    :style="{ backgroundImage: `url(${setRaceIcon(stat.raceGames.race)})` }">
+                                    <span class="winrate-value">{{ stat.winratePercentage }}</span>
+                                    <span class="winrate-sub">%</span>
+                                </div>
+                            </v-progress-circular>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- WIN RATE CIRCULAR PROGRESS STATS -->
             <div class="matchHistory">
                 <div v-if="parsedData && parsedData.matches" class="matchHistoryList">
                     <h1 class="panel-title">Match History</h1>
@@ -83,6 +104,7 @@
                                 <td>Outcome</td>
                                 <td>Player 1</td>
                                 <td>Player 2</td>
+                                <td>Date</td>
                             </tr>
                         </thead>
                         <tbody v-for="match in sortedMatches">
@@ -98,21 +120,29 @@
                                         && match.players[0].decision === 'LOSS' ||
                                         match.players[1]?.name === charDetails.Tag
                                         && match.players[1].decision === 'LOSS'
-                                }">{{ setOutcome(match) }}</td>
-                                <td><img v-if="match.players[0]" :src="setRaceIcon(match.players[0].race)"
+                                }">{{ setOutcome(match) }}
+                                </td>
+                                <td>
+                                    <img v-if="match.players[0]" :src="setRaceIcon(match.players[0].race)"
                                         :alt="match.players[0].race" width="16" height="16" />
                                     {{ match.players[0]
                                         ? `${match.players[0]?.name} (${match.players[0]?.mmr}
                                     ${showMMRchange(match.players[0]?.ratingChange)})`
                                         : "-- Unkown player --"
-                                    }}</td>
-                                <td><img v-if="match.players[1]" :src="setRaceIcon(match.players[1].race)"
+                                    }}
+                                </td>
+                                <td>
+                                    <img v-if="match.players[1]" :src="setRaceIcon(match.players[1].race)"
                                         :alt="match.players[1].race" width="16" height="16" />
                                     {{ match.players[1]
                                         ? `${match.players[1]?.name} (${match.players[1]?.mmr}
                                     ${showMMRchange(match.players[1]?.ratingChange)})`
                                         : "-- Unkown player --"
-                                    }}</td>
+                                    }}
+                                </td>
+                                <td>
+                                    {{ DateFormatter.formatDateTimeLocal(match.datetime) }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -126,15 +156,21 @@
 import { onMounted, ref, nextTick } from 'vue';
 import { characterDetails } from '../models/characterDetails';
 import { parsePulseMatches } from '../parsePulseMatches';
+import { DateFormatter } from '../utils/dateFormatter';
+import { GameModes } from '../models/gameModes';
+import { WinrateStat } from '../models/winrateStat';
 
 const props = defineProps<{
-    characterId: string
+    characterId: string,
+    seasonId: number
 }>();
 
 const API_BASE_URL = 'http://localhost:3000/api';
 let isLoading = ref(true);
 const parsedData = ref<any>(null);
 const sortedMatches = ref<any>(null);
+const winrateMainRace = ref<WinrateStat>();
+const winrateOffRaces = ref<WinrateStat[]>([]);
 
 const charDetails = ref<characterDetails>({
     Name: '',
@@ -155,8 +191,10 @@ const currentWinRate = ref(0); // the actual value used in our circular progress
 
 onMounted(async () => {
     try {
+        console.log('Season Id : ', props.seasonId);
         isLoading.value = true;
         await loadCharacterDetails(props.characterId);
+        await loadCharacterStats(props.characterId);
         await loadMatchHistory(props.characterId);
     } catch (error) {
         console.error(error);
@@ -172,7 +210,7 @@ onMounted(async () => {
 async function animateWinrateCircularProgress() {
     currentWinRate.value = 0;
     const totalSteps = targetWinRate.value;
-    if (totalSteps <= 0) return; 
+    if (totalSteps <= 0) return;
 
     const timeInterval = 750 / totalSteps;
     const tickTimer = setInterval(() => {
@@ -206,7 +244,6 @@ async function loadMatchHistory(characterId: string) {
     parsedData.value = parsePulseMatches(data, { focalName: charDetails.value.Tag });
     console.log('Final parsing data output', parsedData.value);
 
-    // sort matches
     const characterName = parsedData.value.focalPlayer;
     sortedMatches.value = parsedData.value.matches.map((match: any) => ({
         ...match,
@@ -215,13 +252,41 @@ async function loadMatchHistory(characterId: string) {
         )
     }));
 
-    console.log('sortedMatches', sortedMatches.value);
-
-    targetWinRate.value = sortedMatches.value[0].players[0].record.percent;
-    console.log(sortedMatches.value[0].players[0].record);
-    console.log('Winrate', currentWinRate.value);
-
     setWinsPerRaceStats(parsedData.value.winsVsRace);
+}
+
+async function loadCharacterStats(characterId: string) {
+    const url = `${API_BASE_URL}/character-teams?characterId=${characterId}&seasonId=${props.seasonId}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch SC2 Pulse Match History data.');
+
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error('Error parsing SC2 Pulse Match History data');
+
+    const mappedWinsPerRace: WinrateStat[] = data
+        .filter((x: { queueType: number; }) => x.queueType === GameModes['1v1'])
+        .map((raceMember: any) => {
+            const raceGamesObj = raceMember.members[0]?.raceGames || {};
+
+            return new WinrateStat({
+                wins: raceMember.wins,
+                losses: raceMember.losses,
+                raceGames: {
+                    race: String(Object.keys(raceGamesObj)[0] || 'UNKNOWN'),
+                    games: Number(Object.values(raceGamesObj)[0] || 0)
+                }
+            })
+        });
+
+    const sortedWinsPerRace = mappedWinsPerRace.sort((a, b) => b.raceGames?.games - a.raceGames?.games);
+    const [mainRace, ...offRaces] = sortedWinsPerRace;
+
+    winrateMainRace.value = mainRace;
+    winrateOffRaces.value = offRaces;
+
+    targetWinRate.value = mainRace.winratePercentage;
+    console.log('winrateMainRace', winrateMainRace);
+    console.log('winrateOffRaces', winrateOffRaces);
 }
 
 function setCharacterDetails(memberCharacter: any) {
@@ -239,9 +304,9 @@ function setWinsPerRaceStats(winsVsRace: any) {
 }
 
 function setRaceIcon(race: string | null | undefined) {
-    if (race === "Terran") return "/assets/terran.svg";
-    if (race === "Protoss") return "/assets/protoss.svg";
-    if (race === "Zerg") return "/assets/zerg.svg";
+    if (race?.toUpperCase() === "TERRAN") return "/assets/terran.svg";
+    if (race?.toUpperCase() === "PROTOSS") return "/assets/protoss.svg";
+    if (race?.toUpperCase() === "ZERG") return "/assets/zerg.svg";
     return "/assets/random.svg";
 }
 
@@ -294,7 +359,7 @@ html {
     margin: 0px 0px 25px 0px;
 }
 
-.stats > div {
+.stats>div {
     margin-bottom: 100px;
 }
 
@@ -345,7 +410,7 @@ html {
     margin-left: 15px;
 }
 
-.raceStats > div,
+.raceStats>div,
 .characterDetails {
     margin-right: 70px;
 }
@@ -358,10 +423,25 @@ html {
     color: rgb(196, 9, 9);
 }
 
-.winrate-block {
+/* --- LAYOUT CONTAINERS --- */
+.winrate-block,
+.winrate-block-offraces-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.winrate-block-offraces-container {
+    justify-content: center;
+    width: 400px;
+}
+
+.winrate-block-offraces-items {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
 }
 
 .winrate-title {
@@ -369,11 +449,54 @@ html {
 }
 
 .winrate-inner {
-    font-size: x-large;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
+.winrate-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: inherit;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 50%;
+    opacity: 0.6;
+}
+
+.winrate-inner .winrate-value,
+.winrate-inner .winrate-sub {
+    z-index: 1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* --- TYPOGRAPHY & COLORS --- */
+:deep(.winrate-inner .winrate-value),
+.winrate-inner .winrate-value {
+    color: #ffffff !important;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+:deep(.winrate-inner .winrate-sub),
+.winrate-inner .winrate-sub {
+    color: #ffffff !important;
+    font-weight: 700;
+    margin-left: 1px;
+}
+
+.winrate-inner-main .winrate-value { font-size: 1.50rem; }
+.winrate-inner-main .winrate-sub { font-size: 1rem; }
+
+.winrate-inner-offrace .winrate-value { font-size: 1.25rem; }
+.winrate-inner-offrace .winrate-sub { font-size: 1rem; }
+
 :deep(.v-progress-circular__overlay) {
-  transition: none !important;
+    transition: none !important;
 }
 
 table {
