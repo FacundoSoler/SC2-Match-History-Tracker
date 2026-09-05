@@ -1,67 +1,71 @@
 <template>
     <form @submit.prevent="search()">
-        <div>
-            <title>SC2 Match History Tracker</title>
-            <h2>SC2 Match History Tracker</h2>
-        </div>
-
-        <div class="main-content">
-            <div style="display: flex; align-items: center;">
-                <label for="">BattleNet profile Link:</label>
-                <v-text-field width="200px" v-model="battleNetProfile" placeholder="name, btag#123, [cLaN],"
-                    variant="outlined" density="compact" hide-details color="#0d6efd"
-                    class="sc2-search-input"></v-text-field>
-                <v-btn type="submit" color="#0d6efd" class="sc2-search-btn" height="40" elevation="0"
-                    :loading="isLoading">Search
-                </v-btn>
+        <div class="characterSearch-main-container">
+            <div>
+                <title>SC2 Match History Tracker</title>
             </div>
-            <div v-show="!isLoading && characterList" class="results">
-                <div id="characterList">
-                    <table>
-                        <thead>
-                            <tr>
-                                <td>Region</td>
-                                <td>Best 1v1 League</td>
-                                <td>Best 1v1 MMR</td>
-                                <td>Total 1v1 Games</td>
-                                <td>Last 1v1 MMR</td>
-                                <td>Last 1v1 Games</td>
-                                <td>Player</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="character in characterList">
-                                <td><img :src="setRegionIcon(character.members.character.region)" width="22px">
-                                </td>
-                                <td><img :src="setLeagueIcon(character.leagueMax)" width="20px">
-                                </td>
-                                <td>{{ character.ratingMax }}</td>
-                                <td>{{ character.totalGamesPlayed }}</td>
-                                <td>{{ character.currentStats.rating }}</td>
-                                <td>{{ character.currentStats.gamesPlayed }}</td>
-                                <td>
-                                    <router-link style="display: flex; align-items: center; gap: 6px;"
-                                        class="matchHistoryLink" :to="{
-                                            name: 'matches',
-                                            params: { characterId: character.members.character.id, seasonId: currentSeason }
-                                        }">
-                                        <span style="display: flex;">
-                                            <img style="width: 12px;" :src="setRaceIcon(character.members.raceGames)"
-                                                width="15px">
-                                        </span>
-                                        <span>
-                                            {{ character.members.character.tag }} | {{
-                                                character.members.account.battleTag
-                                            }}
-                                        </span>
-                                    </router-link>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+            <h2 style="text-align: center;">SC2 Match History Tracker</h2>
+
+            <div>
+                <div class="searchBar">  
+                    <label for="">BattleNet profile Link:</label>
+                    <v-text-field width="200px" v-model="battleNetProfile" placeholder="name, btag#123, [cLaN],"
+                        variant="outlined" density="compact" hide-details color="#0d6efd"
+                        class="sc2-search-input"></v-text-field>
+                    <v-btn type="submit" color="#0d6efd" class="sc2-search-btn" height="40" elevation="0"
+                        :loading="isLoading">Search
+                    </v-btn>
+                </div>
+                <div v-show="!isLoading && characterList" class="characterSearchResults">
+                    <div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td>Region</td>
+                                    <td>Best 1v1 League</td>
+                                    <td>Best 1v1 MMR</td>
+                                    <td>Total 1v1 Games</td>
+                                    <td>Last 1v1 MMR</td>
+                                    <td>Last 1v1 Games</td>
+                                    <td>Player</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="character in characterList">
+                                    <td><img :src="setRegionIcon(character.members.character.region)" width="22px">
+                                    </td>
+                                    <td><img :src="setLeagueIcon(character.leagueMax)" width="20px">
+                                    </td>
+                                    <td>{{ character.ratingMax }}</td>
+                                    <td>{{ character.totalGamesPlayed }}</td>
+                                    <td>{{ character.currentStats.rating }}</td>
+                                    <td>{{ character.currentStats.gamesPlayed }}</td>
+                                    <td>
+                                        <router-link style="display: flex; align-items: center; gap: 6px;"
+                                            class="matchHistoryLink" :to="{
+                                                name: 'matches',
+                                                params: { characterId: character.members.character.id, seasonId: currentSeason }
+                                            }">
+                                            <span style="display: flex;">
+                                                <img style="width: 12px;"
+                                                    :src="setRaceIcon(character.members.raceGames)" width="15px">
+                                            </span>
+                                            <span>
+                                                {{ character.members.character.tag }} | {{
+                                                    character.members.account.battleTag
+                                                }}
+                                            </span>
+                                        </router-link>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
+
     </form>
 
 </template>
@@ -93,9 +97,9 @@ async function getSeasons() {
         if (!data || !Array.isArray(data)) throw new Error('Error parsing Seasons data');
 
         const seasonDetails: SeasonDetails[] = data;
-        currentSeason.value = seasonDetails.sort((a,b) => b.battlenetId - a.battlenetId)[0]?.battlenetId;
+        currentSeason.value = seasonDetails.sort((a, b) => b.battlenetId - a.battlenetId)[0]?.battlenetId;
 
-    } catch (error:any) {
+    } catch (error: any) {
         console.error(error);
     }
 }
@@ -173,9 +177,17 @@ html {
     color: rgb(191, 192, 192);
 }
 
-.main-content {
+.characterSearch-main-container {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+}
+
+.searchBar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 .sc2-search-input {
@@ -201,8 +213,10 @@ html {
     letter-spacing: normal;
 }
 
-.results {
+.characterSearchResults {
     margin-top: 10px;
+    display: flex;
+    justify-content: center;
 }
 
 .matchHistoryLink {

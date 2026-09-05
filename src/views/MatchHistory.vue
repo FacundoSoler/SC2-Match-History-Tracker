@@ -6,10 +6,11 @@
 
     <div v-if="!isLoading" class="main-content">
         <div class="panels">
-            <div class="stats">
+            <div class="character-stats-panel">
                 <h1 class="panel-title">Character Stats</h1>
                 <div class="characterDetailsSection">
                     <table>
+                        <caption>Character details</caption>
                         <thead>
                             <tr>
                                 <td>Name</td>
@@ -26,6 +27,64 @@
                                     <img src="/assets/region_us.svg" width="22px">
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- WIN RATE CIRCULAR PROGRESS STATS -->
+                <div class="winrate-block">
+                    <div class="winrate-block-main-race-container ">
+                        <div class="winrate-title">
+                            Main Race winrate
+                        </div>
+
+                        <v-progress-circular :model-value="currentWinRate" :size="150" :width="15" color="primary">
+                            <div class="winrate-inner winrate-inner-main"
+                                :style="{ backgroundImage: `url(${setRaceIcon(winrateMainRace?.raceGames.race)})` }">
+                                <span class="winrate-value">{{ currentWinRate }}</span>
+                                <span class="winrate-sub">%</span>
+                            </div>
+                        </v-progress-circular>
+                    </div>
+
+                    <div v-if="winrateOffRaces.length > 0" class="winrate-block-offraces-container">
+                        <div class="winrate-title">Off-Races winrates</div>
+
+                        <div class="winrate-block-offraces-items">
+                            <div v-for="stat in winrateOffRaces" :key="stat.raceGames.race">
+                                <v-progress-circular :model-value="stat.winratePercentage" :size="100" :width="12"
+                                    color="primary">
+                                    <div class="winrate-inner winrate-inner-offrace"
+                                        :style="{ backgroundImage: `url(${setRaceIcon(stat.raceGames.race)})` }">
+                                        <span class="winrate-value">{{ stat.winratePercentage }}</span>
+                                        <span class="winrate-sub">%</span>
+                                    </div>
+                                </v-progress-circular>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="hasAbandonedGames" class="abandoned-games">
+                    <table>
+                        <caption>Abandoned Games</caption>
+                        <thead>
+                            <tr>
+                                <th>Race</th>
+                                <th v-for="opp in ['Protoss', 'Zerg', 'Terran', 'Random']" :key="'th-' + opp">
+                                    vs{{ opp }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="race in ['Protoss', 'Zerg', 'Terran', 'Random']" :key="race">
+                                <tr v-if="showAbandonedGamesRow(race)">
+                                    <td>{{ race }}</td>
+                                    <td v-for="opp in ['Protoss', 'Zerg', 'Terran', 'Random']" :key="race + '-' + opp">
+                                        {{ abandonedGames[race]['vs' + opp] || '' }}
+                                    </td>
+                                </tr>
+                            </template>
                         </tbody>
                     </table>
                 </div>
@@ -54,41 +113,11 @@
                     </table>
                 </div>
 
-                <!-- WIN RATE CIRCULAR PROGRESS STATS -->
-                <div class="winrate-block">
-                    <div class="winrate-title">Main Race winrate</div>
-
-                    <v-progress-circular :model-value="currentWinRate" :size="150" :width="15" color="primary">
-                        <div class="winrate-inner winrate-inner-main"
-                            :style="{ backgroundImage: `url(${setRaceIcon(winrateMainRace?.raceGames.race)})` }">
-                            <span class="winrate-value">{{ currentWinRate }}</span>
-                            <span class="winrate-sub">%</span>
-                        </div>
-                    </v-progress-circular>
-                </div>
-
-                <div v-if="winrateOffRaces.length > 0" class="winrate-block-offraces-container">
-                    <div class="winrate-title">Off-Races winrates</div>
-
-                    <div class="winrate-block-offraces-items">
-                        <div v-for="stat in winrateOffRaces" :key="stat.raceGames.race">
-                            <v-progress-circular :model-value="stat.winratePercentage" :size="100" :width="12"
-                                color="primary">
-                                <div class="winrate-inner winrate-inner-offrace"
-                                    :style="{ backgroundImage: `url(${setRaceIcon(stat.raceGames.race)})` }">
-                                    <span class="winrate-value">{{ stat.winratePercentage }}</span>
-                                    <span class="winrate-sub">%</span>
-                                </div>
-                            </v-progress-circular>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
             <!-- WIN RATE CIRCULAR PROGRESS STATS -->
             <div class="matchHistory">
-                <div v-if="parsedData && parsedData.matches" class="matchHistoryList">
+                <div v-if="sortedMatches" class="matchHistoryList">
                     <h1 class="panel-title">Match History</h1>
                     <table>
                         <thead>
@@ -102,7 +131,9 @@
                             </tr>
                         </thead>
                         <tbody v-for="match in sortedMatches">
-                            <tr>
+                            <tr :class="{
+                                'abandoned-game': isAbandonedGame(match)
+                            }">
                                 <td>{{ match.duration }}</td>
                                 <td>{{ match.map }}</td>
                                 <td :class="{
@@ -155,12 +186,16 @@ const props = defineProps<{
     seasonId: number
 }>();
 
-const API_BASE_URL = 'http://localhost:3000/api';
 let isLoading = ref(true);
-const parsedData = ref<any>(null);
+
+const API_BASE_URL = 'http://localhost:3000/api';
+const ABANDONED_GAME_THRESHOLD_IN_SECONDS = 60;
 const sortedMatches = ref<any>(null);
 const winrateMainRace = ref<WinrateStat>();
 const winrateOffRaces = ref<WinrateStat[]>([]);
+
+const targetWinRate = ref(0); // from our API data set
+const currentWinRate = ref(0); // the actual value used in our circular progress Component (UI)
 
 const charDetails = ref<characterDetails>({
     Name: '',
@@ -176,8 +211,14 @@ let stats: Partial<{
     Random: string
 }> = {};
 
-const targetWinRate = ref(0); // from our API data set
-const currentWinRate = ref(0); // the actual value used in our circular progress Component (UI)
+const abandonedGames = ref<Record<string, Record<string, number>>>({
+    Protoss: { vsProtoss: 0, vsZerg: 0, vsTerran: 0, vsRandom: 0 },
+    Zerg: { vsProtoss: 0, vsZerg: 0, vsTerran: 0, vsRandom: 0 },
+    Terran: { vsProtoss: 0, vsZerg: 0, vsTerran: 0, vsRandom: 0 },
+    Random: { vsProtoss: 0, vsZerg: 0, vsTerran: 0, vsRandom: 0 }
+});
+
+const hasAbandonedGames = ref(false);
 
 onMounted(async () => {
     try {
@@ -230,18 +271,19 @@ async function loadMatchHistory(characterId: string) {
     const data = await response.json();
     if (!data.result && !Array.isArray(data.result)) throw new Error('Error parsing SC2 Pulse Match History data');
 
-    parsedData.value = parsePulseMatches(data, { focalName: charDetails.value.Name });
-    console.log('Final parsing data output', parsedData.value);
+    const parsedData = parsePulseMatches(data, { focalName: charDetails.value.Name });
 
-    const characterName = parsedData.value.focalPlayer;
-    sortedMatches.value = parsedData.value.matches.map((match: any) => ({
+    const characterName = parsedData.focalPlayer;
+    sortedMatches.value = parsedData.matches.map((match: any) => ({
         ...match,
         players: [...match.players].sort((a, b) =>
             a.displayName === characterName ? -1 : b.displayName === characterName ? 1 : 0
         )
     }));
 
-    setWinsPerRaceStats(parsedData.value.winsVsRace);
+    extractAbandonedGames();
+
+    setWinsPerRaceStats(parsedData.winsVsRace);
 }
 
 async function loadCharacterStats(characterId: string) {
@@ -274,8 +316,6 @@ async function loadCharacterStats(characterId: string) {
     winrateOffRaces.value = offRaces;
 
     targetWinRate.value = mainRace.winratePercentage;
-    console.log('winrateMainRace', winrateMainRace);
-    console.log('winrateOffRaces', winrateOffRaces);
 }
 
 function setCharacterDetails(memberCharacter: any) {
@@ -325,6 +365,47 @@ function setOutcome(match: any) {
     }
 }
 
+function isAbandonedGame(match: any) {
+    const isAbandonedGame =
+        (match.durationSeconds
+            && match.players[0]?.displayName === charDetails.value.Name
+            && match.durationSeconds < ABANDONED_GAME_THRESHOLD_IN_SECONDS)
+        && match.players[0].decision === 'LOSS';
+
+    return isAbandonedGame;
+}
+
+function extractAbandonedGames() {
+    for (const match of sortedMatches.value) {
+        // Guard clauses: Check players exist, duration is less than the expected threshold, name matches Character and is a LOSS
+        if (!match.players || match.players.length < 2) continue;
+        if (typeof match.durationSeconds !== 'number' || match.durationSeconds > ABANDONED_GAME_THRESHOLD_IN_SECONDS) continue;
+        if (match.players[0].displayName !== charDetails.value.Name) continue;
+        if (match.players[0].decision.toUpperCase() !== 'LOSS') continue;
+
+        const race1 = match.players[0].race;
+        const race2 = match.players[1].race;
+        const vsKey = `vs${race2}`;
+
+        if (abandonedGames.value[race1] && vsKey in abandonedGames.value[race1]) {
+            abandonedGames.value[race1][vsKey]++;
+        }
+
+        hasAbandonedGames.value = true;
+    }
+}
+
+function showAbandonedGamesRow(race: string) {
+    if (abandonedGames.value[race].vsProtoss === 0
+        && abandonedGames.value[race].vsZerg === 0
+        && abandonedGames.value[race].vsTerran === 0
+        && abandonedGames.value[race].vsRandom === 0) {
+        return false;
+    }
+
+    return true;
+}
+
 </script>
 <style scoped>
 html {
@@ -348,8 +429,15 @@ html {
     margin: 0px 0px 25px 0px;
 }
 
-.stats>div {
-    margin-bottom: 100px;
+.character-stats-panel {
+    flex-grow: 0;
+    width: fit-content;
+    min-width: 500px; 
+    max-width: 800px;
+}
+
+.character-stats-panel>div {
+    margin-bottom: 65px;
 }
 
 .back-link {
@@ -390,6 +478,7 @@ html {
     opacity: 0.9;
 }
 
+.abandoned-games,
 .raceStats,
 .characterDetailsSection {
     display: flex;
@@ -398,6 +487,10 @@ html {
     justify-content: center;
     margin-top: 15px;
     margin-left: 15px;
+}
+
+.abandoned-game {
+    background-color: rgb(109 12 12);
 }
 
 .raceStats>div,
@@ -413,17 +506,26 @@ html {
     color: rgb(196, 9, 9);
 }
 
-/* --- LAYOUT CONTAINERS --- */
-.winrate-block,
-.winrate-block-offraces-container {
+.winrate-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.winrate-block-main-race-container {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
+/* --- LAYOUT CONTAINERS --- */
 .winrate-block-offraces-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: center;
     justify-content: center;
-    width: 400px;
 }
 
 .winrate-block-offraces-items {
@@ -479,11 +581,21 @@ html {
     margin-left: 1px;
 }
 
-.winrate-inner-main .winrate-value { font-size: 1.50rem; }
-.winrate-inner-main .winrate-sub { font-size: 1rem; }
+.winrate-inner-main .winrate-value {
+    font-size: 1.50rem;
+}
 
-.winrate-inner-offrace .winrate-value { font-size: 1.25rem; }
-.winrate-inner-offrace .winrate-sub { font-size: 1rem; }
+.winrate-inner-main .winrate-sub {
+    font-size: 1rem;
+}
+
+.winrate-inner-offrace .winrate-value {
+    font-size: 1.25rem;
+}
+
+.winrate-inner-offrace .winrate-sub {
+    font-size: 1rem;
+}
 
 :deep(.v-progress-circular__overlay) {
     transition: none !important;
@@ -507,5 +619,9 @@ thead td {
 
 h1 {
     color: rgb(136, 143, 202);
+}
+
+caption {
+    margin-bottom: 10px;
 }
 </style>
