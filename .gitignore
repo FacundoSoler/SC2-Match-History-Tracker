@@ -1,3 +1,4 @@
 /node_modules
 /src/server/node_modules
 /public/assets/backup
+/dist
