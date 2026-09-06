@@ -49,7 +49,7 @@
                                             }">
                                             <span style="display: flex;">
                                                 <img style="width: 12px;"
-                                                    :src="setRaceIcon(character.members.raceGames)" width="15px">
+                                                    :src="getRaceIconLink(character.members.raceGames)" width="15px">
                                             </span>
                                             <span>
                                                 {{ character.members.character.tag }} | {{
@@ -72,6 +72,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { SeasonDetails } from '../models/seasonDetails';
+import { getRaceIconLink } from '../utils/assetsHelper';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -146,26 +147,6 @@ function setLeagueIcon(leagueMax: number) {
     if (leagueMax === 4) return "/assets/league_diamond.svg";
     if (leagueMax === 5) return "/assets/league_master.svg";
     if (leagueMax === 6) return "/assets/league_grandmaster.svg";
-}
-
-function setRaceIcon(raceGames: any) {
-    const mapRaceGames = {
-        Protoss: raceGames.PROTOSS ?? 0,
-        Terran: raceGames.TERRAN ?? 0,
-        Zerg: raceGames.ZERG ?? 0,
-        Random: raceGames.RANDOM ?? 0
-    };
-
-    const sortedRaceGames = Object.entries(mapRaceGames)
-        .map(([race, games]) => ({ race, games }))
-        .sort((a, b) => b.games - a.games);
-
-    const mostPlayedRace = sortedRaceGames[0].race;
-
-    if (mostPlayedRace === 'Terran') return '/assets/terran.svg';
-    if (mostPlayedRace === 'Zerg') return '/assets/zerg.svg';
-    if (mostPlayedRace === 'Protoss') return '/assets/protoss.svg';
-    if (mostPlayedRace === 'Random') return '/assets/random.svg';
 }
 
 </script>
