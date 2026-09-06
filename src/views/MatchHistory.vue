@@ -224,7 +224,7 @@ const hasAbandonedGames = ref(false);
 onMounted(async () => {
     try {
         isLoading.value = true;
-        
+
         console.time();
          await Promise.all([loadCharacterDetails(props.characterId),
         loadCharacterStats(props.characterId),
@@ -422,6 +422,7 @@ html {
 .main-content {
     display: flex;
     flex-direction: column;
+    margin-top: 10px;
 }
 
 .panels {
@@ -445,10 +446,11 @@ html {
 }
 
 .back-link {
+    position: absolute;
     display: inline-flex;
     align-items: center;
+    margin-left: 10px;
     gap: 8px;
-    margin: 12px 16px;
     padding: 8px 14px;
     border-radius: 999px;
     border: 1px solid rgba(154, 163, 199, 0.25);
