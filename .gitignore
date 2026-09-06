@@ -2,3 +2,5 @@
 /src/server/node_modules
 /public/assets/backup
 /dist
+.env
+.env.*
