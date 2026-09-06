@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Open PowerShell",
+      "type": "shell",
+      "command": "powershell",
+      "isBackground": true,
+      "presentation": {
+        "group": "dev-layout",
+        "panel": "new",
+        "tabName": "powershell"
+      }
+    },
+    {
+      "label": "Start Node Server",
+      "type": "shell",
+      "command": "npm run start:server",
+      "isBackground": true,
+      "presentation": {
+        "group": "dev-layout",
+        "panel": "new",
+        "tabName": "NodeJS Server"
+      }
+    },
+    {
+      "label": "Start Tests",
+      "type": "shell",
+      "command": "npm run test:watch",
+      "isBackground": true,
+      "presentation": {
+        "group": "dev-layout",
+        "panel": "new",
+        "tabName": "Tests"
+      }
+    },
+    {
+      "label": "Launch Dev Terminals",
+      "dependsOn": [
+        "Open PowerShell",
+        "Start Node Server",
+        "Start Tests"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

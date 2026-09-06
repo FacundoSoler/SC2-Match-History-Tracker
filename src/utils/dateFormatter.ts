@@ -13,7 +13,7 @@ export class DateFormatter {
         return formattedUTCDate;
     }
 
-    static formatDateTimeLocal(isoString: string): string {
+    static formatDateTimeLocal(isoString: string, timeZone?: string): string {
         const date = new Date(isoString);
 
         return new Intl.DateTimeFormat('en-GB', {
@@ -23,7 +23,8 @@ export class DateFormatter {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: false
+            hour12: false,
+            ...(timeZone && { timeZone })
         }).format(date);
     }
 }
