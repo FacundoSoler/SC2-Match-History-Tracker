@@ -1,9 +1,10 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+import 'dotenv/config';
 
 const app = express();
 const PORT = 3000;
-const SC2PULSE_API_URL = process.env.SC2PULSE_API_URL || 'https://sc2pulse.nephest.com/sc2/api';
+const SC2PULSE_API_BASE_URL = process.env.SC2PULSE_API_URL || 'https://sc2pulse.nephest.com/sc2/api';
 
 app.use(cors());
 
