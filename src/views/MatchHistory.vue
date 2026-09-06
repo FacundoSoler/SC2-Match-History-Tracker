@@ -1,5 +1,5 @@
 <template>
-    <router-link to="/" class="back-link">
+    <router-link v-if="!isLoading" to="/" class="back-link">
         <v-icon icon="mdi-arrow-left" size="18" class="back-icon" />
         <span>Character Search</span>
     </router-link>
