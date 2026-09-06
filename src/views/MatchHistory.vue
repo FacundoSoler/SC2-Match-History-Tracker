@@ -117,7 +117,7 @@
 
             <!-- WIN RATE CIRCULAR PROGRESS STATS -->
             <div class="matchHistory">
-                <div v-if="sortedMatches" class="matchHistoryList">
+                <div v-show="sortedMatches" class="matchHistoryList">
                     <h1 class="panel-title">Match History</h1>
                     <table>
                         <thead>
@@ -224,9 +224,13 @@ const hasAbandonedGames = ref(false);
 onMounted(async () => {
     try {
         isLoading.value = true;
-        await loadCharacterDetails(props.characterId);
-        await loadCharacterStats(props.characterId);
-        await loadMatchHistory(props.characterId);
+        
+        console.time();
+         await Promise.all([loadCharacterDetails(props.characterId),
+        loadCharacterStats(props.characterId),
+        loadMatchHistory(props.characterId)]);
+
+        console.timeEnd();
     } catch (error) {
         console.error(error);
     } finally {
