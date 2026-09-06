@@ -73,12 +73,11 @@
 import { onMounted, ref } from 'vue';
 import { SeasonDetails } from '../models/seasonDetails';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 defineOptions({ name: "CharacterSearch" });
 
-const API_BASE_URL = 'http://localhost:3000/api';
-
 let isLoading = ref(false);
-
 const battleNetProfile = ref('');
 const characterList = ref<any>(null);
 let currentSeason = ref(0);
@@ -226,7 +225,6 @@ html {
 table {
     border-collapse: separate;
     border-spacing: 20px 8px;
-    /* horizontal, vertical */
 }
 
 th,

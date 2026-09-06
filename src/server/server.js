@@ -3,7 +3,7 @@ const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
-const SC2PULSE_API_BASE_URL = 'https://sc2pulse.nephest.com/sc2/api';
+const SC2PULSE_API_URL = process.env.SC2PULSE_API_URL || 'https://sc2pulse.nephest.com/sc2/api';
 
 app.use(cors());
 

@@ -181,6 +181,8 @@ import { DateFormatter } from '../utils/dateFormatter';
 import { GameModes } from '../models/gameModes';
 import { WinrateStat } from '../models/winrateStat';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const props = defineProps<{
     characterId: string,
     seasonId: number
@@ -188,7 +190,6 @@ const props = defineProps<{
 
 let isLoading = ref(true);
 
-const API_BASE_URL = 'http://localhost:3000/api';
 const ABANDONED_GAME_THRESHOLD_IN_SECONDS = 60;
 const sortedMatches = ref<any>(null);
 const winrateMainRace = ref<WinrateStat>();
@@ -430,8 +431,7 @@ html {
 }
 
 .character-stats-panel {
-    flex-grow: 0;
-    width: fit-content;
+    flex: 0 1 auto;
     min-width: 500px; 
     max-width: 800px;
 }
@@ -510,6 +510,7 @@ html {
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 40px;
 }
 
 .winrate-block-main-race-container {
@@ -523,7 +524,7 @@ html {
 .winrate-block-offraces-container {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    flex-grow: 1 0 auto;
     align-items: center;
     justify-content: center;
 }
@@ -531,9 +532,9 @@ html {
 .winrate-block-offraces-items {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
-    width: 100%;
+    gap: 30px;
 }
 
 .winrate-title {
