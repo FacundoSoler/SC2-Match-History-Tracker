@@ -15,4 +15,18 @@ describe('LinkFormatter', () => {
 
         expect(result).toBe(expected);
     });
+
+    it('setRaceIconLink returns valid most played race icon for Zerg', () =>{
+        const arrange = {
+            Protoss: 750,
+            Terran: 50,
+            Zerg: 900,
+            Random: 500
+        };
+
+        const result = getRaceIconLink(arrange);
+        const expected = '/assets/terran.svg';
+
+        expect(result).toBe(expected);
+    });
 })
