@@ -26,7 +26,7 @@ describe('LinkFormatter', () => {
         };
 
         const result = getRaceIconLink(arrange);
-        const expected = '/assets/zerg2.svg';
+        const expected = '/assets/zerg.svg';
 
         expect(result).toBe(expected);
     });
