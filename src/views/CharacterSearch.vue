@@ -118,6 +118,7 @@ async function search() {
         if (!data || !Array.isArray(data)) throw new Error('Error parsing SC2 characters response data');
 
         characterList.value = data;
+        console.log('characterList', characterList);
 
     } catch (error) {
         console.error('Error fetching server API SC2 Pulse Match History', error);

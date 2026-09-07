@@ -449,7 +449,7 @@ html {
     position: absolute;
     display: inline-flex;
     align-items: center;
-    margin-left: 10px;
+    margin: 10px;
     gap: 8px;
     padding: 8px 14px;
     border-radius: 999px;

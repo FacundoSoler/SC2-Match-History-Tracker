@@ -1,9 +1,16 @@
-export function getRaceIconLink(raceGames: any) {
+export interface RaceGames {
+    PROTOSS: number;
+    TERRAN: number;
+    ZERG: number;
+    RANDOM: number;
+}
+
+export function getRaceIconLink(raceGames: RaceGames) {
     const mapRaceGames = {
-        Protoss: raceGames.PROTOSS ?? 0,
-        Terran: raceGames.TERRAN ?? 0,
-        Zerg: raceGames.ZERG ?? 0,
-        Random: raceGames.RANDOM ?? 0
+        PROTOSS: raceGames.PROTOSS ?? 0,
+        TERRAN: raceGames.TERRAN ?? 0,
+        ZERG: raceGames.ZERG ?? 0,
+        RANDOM: raceGames.RANDOM ?? 0
     };
 
     const sortedRaceGames = Object.entries(mapRaceGames)
@@ -12,8 +19,8 @@ export function getRaceIconLink(raceGames: any) {
 
     const mostPlayedRace = sortedRaceGames[0].race;
 
-    if (mostPlayedRace === 'Terran') return '/assets/terran.svg';
-    if (mostPlayedRace === 'Zerg') return '/assets/zerg.svg';
-    if (mostPlayedRace === 'Protoss') return '/assets/protoss.svg';
-    if (mostPlayedRace === 'Random') return '/assets/random.svg';
+    if (mostPlayedRace === 'TERRAN') return '/assets/terran.svg';
+    if (mostPlayedRace === 'ZERG') return '/assets/zerg.svg';
+    if (mostPlayedRace === 'PROTOSS') return '/assets/protoss.svg';
+    if (mostPlayedRace === 'RANDOM') return '/assets/random.svg';
 }
