@@ -12,7 +12,7 @@ import CharacterSearch from './views/CharacterSearch.vue';
                 </keep-alive>
             </router-view>
         </main>
-        <footer>Ver 1.0 - Created by Facundo Soler. 2006 All rights reserved.</footer>
+        <footer>Ver 1.0 - Created by Facundo Soler. 2026 All rights reserved.</footer>
     </div>
 
 </template>
