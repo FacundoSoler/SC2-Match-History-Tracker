@@ -154,7 +154,8 @@
                                     {{ displayPlayerName(match.players[1]) }}
                                 </td>
                                 <td>
-                                    {{ DateFormatter.formatDateTimeLocal(match.datetime) }}
+                                    {{ DateFormatter.matchHistoryDateDiff(new Date(match.datetime), new Date()) }}
+                                    - {{ DateFormatter.formatDateTimeLocal(match.datetime) }}
                                 </td>
                             </tr>
                         </tbody>

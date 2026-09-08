@@ -27,4 +27,35 @@ export class DateFormatter {
             ...(timeZone && { timeZone })
         }).format(date);
     }
+
+    static matchHistoryDateDiff(mhDatetime: Date, currentDatetime: Date) {
+        const dateDiffMiliseconds = Math.abs(mhDatetime.getTime() - currentDatetime.getTime());
+        const dateDiffMinutes = Math.floor(dateDiffMiliseconds / 1000 / 60);
+
+        if (dateDiffMinutes < 60) {
+            return `${dateDiffMinutes} minutes`;
+        }
+
+        const dateDiffHours = Math.round(dateDiffMinutes / 60);
+        if (dateDiffHours < 24) {
+            if (dateDiffHours === 1) return `${dateDiffHours} hour`;
+            return `${dateDiffHours} hours`;
+        }
+
+        const dateDiffDays = Math.floor(dateDiffHours / 24);
+        if (dateDiffDays < 30) {
+            if (dateDiffDays === 1) return `${dateDiffDays} day`;
+            return `${dateDiffDays} days`;
+        }
+
+        const dateDiffMonths = Math.floor(dateDiffDays / 30);
+        if (dateDiffMonths < 12) {
+            if (dateDiffMonths === 1) return `${dateDiffMonths} month`; 
+            return `${dateDiffMonths} months`;
+        }
+
+        const dateDiffYears = Math.floor(dateDiffMonths / 12);
+        if (dateDiffYears === 1) return `${dateDiffYears} year`;
+        return `${dateDiffYears} years`;
+    }
 }

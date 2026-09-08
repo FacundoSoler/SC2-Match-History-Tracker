@@ -1,5 +1,5 @@
 export function showMMRchange(variation: number) {
-    if (variation === null) return '';
+    if (variation === null || variation === undefined) return '';
 
     let MMRvariationString = variation.toString();
     if (variation > 0) MMRvariationString = `+${MMRvariationString}`;
