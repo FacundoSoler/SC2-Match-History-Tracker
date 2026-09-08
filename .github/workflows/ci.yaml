@@ -7,7 +7,7 @@ on:
     branches: [ master, main ]
 
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,8 +20,11 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install workspace dependencies
         run: npm ci
 
-      - name: Run Vitest Unit Tests
+      - name: Run Unit Tests
         run: npm run test
+
+      - name: Build All Workspaces
+        run: npm run build
