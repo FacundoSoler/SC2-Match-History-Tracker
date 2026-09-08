@@ -1,10 +1,11 @@
 {
   "name": "sc2-pulse-server",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "build": "echo 'No build step required for server'"
   },
   "dependencies": {
     "cors": "^2.8.6",
