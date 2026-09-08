@@ -7,3 +7,7 @@
 .vscode/*
 !.vscode/tasks.json
 !.vscode/launch.json
+/packages/server/node_modules
+/packages/web/node_modules
+/packages/web/public/assets/backup
+/packages/web/dist

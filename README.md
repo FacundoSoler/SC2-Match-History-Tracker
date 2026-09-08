@@ -1,8 +1,28 @@
 # SC2 Match History Tracker
 
-A modern, responsive web application for searching, tracking, and analyzing StarCraft II player profiles, MMR statistics, ladder performance, and detailed match histories across all regions.
+A modern, responsive web application for searching, tracking, and analyzing StarCraft II player profiles, MMR statistics, ladder performance, and detailed match histories across all regions. Built as a monorepo to support web, server, shared libraries, and local API integration.
+
+This project is based on the SC2Pulse website which you can check here : 
+(https://sc2pulse.nephest.com/sc2)
 
 ![SC2 Match History Tracker](https://raw.githubusercontent.com/placeholder/sc2-tracker/main/preview.png)
+
+---
+
+## 🏗️ Monorepo Architecture
+
+This repository uses **npm Workspaces** to manage all sub-projects in a single repository:
+
+```text
+sc2-tracker/
+├── packages/
+│   ├── web/          # Vue 3 + Vite + Vuetify frontend application
+│   ├── server/       # Node.js backend service
+│   ├── extension/    # Chrome Extension companion (bypasses CORS for localhost SC2 API)
+│   └── shared/       # Shared TypeScript models, date utilities, and MMR calculators
+├── package.json      # Root workspace orchestrator
+└── tsconfig.json     # Shared base TypeScript configuration
+```
 
 ---
 
@@ -20,69 +40,61 @@ A modern, responsive web application for searching, tracking, and analyzing Star
   - Inspect game outcomes (**WIN** / **LOSS**), duration, and map names.
   - Real-time **MMR adjustments** (+/- ratings).
   - Detailed player name, BattleTag, and main race identifiers.
+- **Chrome Extension Companion**: Integrates directly with StarCraft II's local API (`localhost:6119`) to surface live match state without CORS limitations.
 - **Dark Theme UI**: Clean, high-contrast dark mode styled with **Vuetify**.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: [Vue.js](https://vuejs.org/) (Vue 3 / Options or Composition API)
-- **UI Framework**: [Vuetify](https://vuetifyjs.com/) (Material Design Components)
-- **Styling**: Custom CSS / SASS overrides with Vuetify dark theme
-- **Icons**: Material Design Icons & Custom SC2 Race / Flag assets
-- **Data Source**: StarCraft II Community APIs / Battle.net Data API
+- **Frontend**: Vue 3, Vite, TypeScript
+- **UI Framework**: Vuetify (Material Design)
+- **Backend**: Node.js
+- **Testing**: Vitest
+- **Data Sources**: StarCraft II Community APIs / Battle.net Data API / Local SC2 Client API (`localhost:6119`)
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (`v16.x` or higher recommended)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- [Node.js](https://nodejs.org/) (`v20.x` recommended)
+- [npm](https://www.npmjs.com/) (`v7+` for workspace support)
 
-### Installation - Part 1 (Web app)
+### 1. Setup
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-username/sc2-match-history-tracker.git
-   cd sc2-match-history-tracker
-   ```
+Clone the repository and install all dependencies across all workspaces with a single command from the root:
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/your-username/sc2-match-history-tracker.git
+cd sc2-match-history-tracker
+npm install
+```
 
-3. **Start the local development server:**
-   ```bash
-   npm run dev
-   ```
-   Open your browser and navigate to `http://localhost:5173` (or the port indicated in your console).
+### 2. Available Scripts (Run from Root)
 
-4. **Build for production:**
-   ```bash
-   npm run build
-   ```
+You can run commands for all sub-packages directly from the root folder without needing to `cd` into individual package directories:
+
+| Command | Action |
+| :--- | :--- |
+| `npm run dev` | Starts the Vue web application (`packages/web`) |
+| `npm run dev:server` | Starts the Node.js backend server (`packages/server`) |
+| `npm run test` | Runs the Vitest test suite (`packages/web`) |
+| `npm run test:watch` | Runs Vitest in watch mode |
+| `npm run build` | Builds all sub-packages (`packages/*`) for production |
 
 ---
 
-### Installation - Part 2 (NodeJS Server)
+## 🧩 Chrome Extension Setup (Optional)
 
-1. **Open a new terminal window and navigate to the server folder from the project root:**
-      ```bash
-   cd src/server
-   ```
-      
-2. **Install server dependencies**
-     ```bash
-   npm install
-   ```
-     
-3. **Start the local NodeJS Server**
-     ```bash
-   node server.js
-   ```
+To enable live local SC2 client tracking:
+
+1. Open Chrome and navigate to `chrome://extensions/`.
+2. Enable **Developer mode** (top right toggle).
+3. Click **Load unpacked** and select the `packages/extension` folder.
+
+---
 
 ## 📸 Screenshots
 
