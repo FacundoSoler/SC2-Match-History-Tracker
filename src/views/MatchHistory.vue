@@ -146,20 +146,12 @@
                                 <td>
                                     <img v-if="match.players[0]" :src="setRaceIcon(match.players[0].race)"
                                         :alt="match.players[0].race" width="16" height="16" />
-                                    {{ match.players[0]
-                                        ? `${match.players[0]?.name} (${match.players[0]?.mmr}
-                                    ${showMMRchange(match.players[0]?.ratingChange)})`
-                                        : "-- Unkown player --"
-                                    }}
+                                    {{ displayPlayerName(match.players[0]) }}
                                 </td>
                                 <td>
                                     <img v-if="match.players[1]" :src="setRaceIcon(match.players[1].race)"
                                         :alt="match.players[1].race" width="16" height="16" />
-                                    {{ match.players[1]
-                                        ? `${match.players[1]?.name} (${match.players[1]?.mmr}
-                                    ${showMMRchange(match.players[1]?.ratingChange)})`
-                                        : "-- Unkown player --"
-                                    }}
+                                    {{ displayPlayerName(match.players[1]) }}
                                 </td>
                                 <td>
                                     {{ DateFormatter.formatDateTimeLocal(match.datetime) }}
@@ -181,6 +173,7 @@ import { DateFormatter } from '../utils/dateFormatter';
 import { GameModes } from '../models/gameModes';
 import { WinrateStat } from '../models/winrateStat';
 import { getRaceIconLink, getRegionIcon } from '../utils/assetsHelper';
+import { displayPlayerName, showMMRchange } from '../utils/formatter';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -227,7 +220,7 @@ onMounted(async () => {
         isLoading.value = true;
 
         console.time();
-         await Promise.all([loadCharacterDetails(props.characterId),
+        await Promise.all([loadCharacterDetails(props.characterId),
         loadCharacterStats(props.characterId),
         loadMatchHistory(props.characterId)]);
 
@@ -287,6 +280,8 @@ async function loadMatchHistory(characterId: string) {
         )
     }));
 
+    console.log('sortedMatches', sortedMatches);
+
     extractAbandonedGames();
 
     setWinsPerRaceStats(parsedData.winsVsRace);
@@ -343,14 +338,6 @@ function setRaceIcon(race: string | null | undefined) {
     if (race?.toUpperCase() === "PROTOSS") return "/assets/protoss.svg";
     if (race?.toUpperCase() === "ZERG") return "/assets/zerg.svg";
     return "/assets/random.svg";
-}
-
-function showMMRchange(variation: number) {
-    if (variation === null) return '';
-
-    if (variation > 0) return `+${variation}`;
-
-    return variation;
 }
 
 function setOutcome(match: any) {
@@ -438,7 +425,7 @@ html {
 
 .character-stats-panel {
     flex: 0 1 auto;
-    min-width: 500px; 
+    min-width: 500px;
     max-width: 800px;
 }
 
