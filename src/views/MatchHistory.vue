@@ -221,9 +221,11 @@ onMounted(async () => {
         isLoading.value = true;
 
         console.time();
-        await Promise.all([loadCharacterDetails(props.characterId),
-        loadCharacterStats(props.characterId),
-        loadMatchHistory(props.characterId)]);
+        await Promise.all([
+            loadCharacterDetails(props.characterId),
+            loadCharacterStats(props.characterId)]);
+
+        await loadMatchHistory(props.characterId);
 
         console.timeEnd();
     } catch (error) {
