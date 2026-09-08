@@ -33,7 +33,7 @@
                             </thead>
                             <tbody>
                                 <tr v-for="character in characterList">
-                                    <td><img :src="setRegionIcon(character.members.character.region)" width="22px">
+                                    <td><img :src="getRegionIcon(character.members.character.region)" width="22px">
                                     </td>
                                     <td><img :src="setLeagueIcon(character.leagueMax)" width="20px">
                                     </td>
@@ -72,7 +72,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { SeasonDetails } from '../models/seasonDetails';
-import { getRaceIconLink } from '../utils/assetsHelper';
+import { getRaceIconLink, getRegionIcon } from '../utils/assetsHelper';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -125,14 +125,6 @@ async function search() {
     } finally {
         isLoading.value = false;
     }
-}
-
-function setRegionIcon(region: string | null | undefined) {
-    if (!region) return;
-
-    if (region === "US") return "/assets/region_us.svg";
-    if (region === "EU") return "/assets/region_eu.svg";
-    if (region === "KR") return "/assets/region_kr.svg";
 }
 
 function setMatchHistoryLink(characterId: number) {

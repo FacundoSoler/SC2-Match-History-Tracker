@@ -24,3 +24,11 @@ export function getRaceIconLink(raceGames: RaceGames) {
     if (mostPlayedRace === 'PROTOSS') return '/assets/protoss.svg';
     if (mostPlayedRace === 'RANDOM') return '/assets/random.svg';
 }
+
+export function getRegionIcon(region: string | null | undefined) {
+    if (!region) return;
+
+    if (region === "US") return "/assets/region_us.svg";
+    if (region === "EU") return "/assets/region_eu.svg";
+    if (region === "KR") return "/assets/region_kr.svg";
+}

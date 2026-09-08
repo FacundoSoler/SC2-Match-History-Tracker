@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { getRaceIconLink, RaceGames } from '../../utils/assetsHelper';
+import { getRaceIconLink, getRegionIcon, RaceGames } from '../../utils/assetsHelper';
 
-describe('LinkFormatter', () => {
+describe('assetsHelper', () => {
     it('setRaceIconLink returns valid most played race icon for Protoss', () =>{
         const arrange = {
             PROTOSS: 750,
@@ -59,5 +59,23 @@ describe('LinkFormatter', () => {
         const expected = '/assets/random.svg';
 
         expect(result).toBe(expected);
+    });
+
+    it('getRegionIcon returns valid link for KR server', () => {
+        const region = 'KR';
+        const result = getRegionIcon(region);
+        expect(result).toBe('/assets/region_kr.svg');
+    });
+
+    it('getRegionIcon returns valid link for US server', () => {
+        const region = 'US';
+        const result = getRegionIcon(region);
+        expect(result).toBe('/assets/region_us.svg');
+    });
+
+    it('getRegionIcon returns valid link for EU server', () => {
+        const region = 'EU';
+        const result = getRegionIcon(region);
+        expect(result).toBe('/assets/region_eu.svg');
     });
 })

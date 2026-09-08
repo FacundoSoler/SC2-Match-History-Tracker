@@ -24,7 +24,7 @@
                                 <td>{{ charDetails.Account }}</td>
                                 <td>
                                     {{ charDetails.Region }} -
-                                    <img src="/assets/region_us.svg" width="22px">
+                                    <img :src="getRegionIcon(charDetails.Region)" width="22px">
                                 </td>
                             </tr>
                         </tbody>
@@ -180,6 +180,7 @@ import { parsePulseMatches } from '../parsePulseMatches';
 import { DateFormatter } from '../utils/dateFormatter';
 import { GameModes } from '../models/gameModes';
 import { WinrateStat } from '../models/winrateStat';
+import { getRaceIconLink, getRegionIcon } from '../utils/assetsHelper';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
