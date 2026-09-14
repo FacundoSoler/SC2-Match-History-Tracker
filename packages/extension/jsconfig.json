@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "types": ["chrome"]
+  },
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "sc2-pulse-extension",
+  "version": "1.0.0",
+  "description": "Companion extension to bypass CORS for localhost SC2 API",
+  "scripts": {
+    "build": "echo 'No build step required for raw extension files'"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.2.9"
+  }
+}

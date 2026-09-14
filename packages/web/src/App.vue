@@ -33,6 +33,6 @@ footer {
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  margin: 10px 0px 5px 0px;
+  margin: 10px 0px 20px 0px;
 }
 </style>

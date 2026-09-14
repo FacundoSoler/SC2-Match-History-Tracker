@@ -1,0 +1,40 @@
+import { SeasonDetails } from "../models/seasonDetails";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+export async function searchCharactersByName(searchParam: string) {
+     try {
+        if (!searchParam) return;
+
+        const url = `${API_BASE_URL}/characterList?query=${searchParam}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Error fetching SC2 characters');
+
+        const data = await response.json();
+        if (!data || !Array.isArray(data)) throw new Error('Error parsing SC2 characters response data');
+
+        return data;
+    } catch (error:any) {
+        throw new Error(`Error fetching server API SC2 Pulse Match History', ${error.message}`);
+    }
+}
+
+export async function getCurrentSeason(): Promise<number | undefined> {
+     try {
+        const url = `${API_BASE_URL}/seasons`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Error fetching Seasons data');
+
+        const data = await response.json();
+        if (!data || !Array.isArray(data)) throw new Error('Error parsing Seasons data');
+
+        const seasonDetails: SeasonDetails[] = data;
+        const sortedData = seasonDetails.sort((a, b) => b.battlenetId - a.battlenetId)[0]?.battlenetId;
+
+        return sortedData;
+
+    } catch (error: any) {
+        console.error(error);
+        return undefined;
+    }
+} 

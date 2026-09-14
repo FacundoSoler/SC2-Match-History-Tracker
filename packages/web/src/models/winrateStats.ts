@@ -1,4 +1,4 @@
-export class WinrateStat {
+export class WinrateStats {
     wins = 0;
     losses = 0;
     raceGames = {
@@ -8,7 +8,7 @@ export class WinrateStat {
     winratePercentage = 0;
     winrateText = '';
 
-    constructor(init?: Partial<WinrateStat>) {
+    constructor(init?: Partial<WinrateStats>) {
         if (init) Object.assign(this, init);
 
         this.winratePercentage = Math.floor(this.wins / (this.raceGames.games / 100));

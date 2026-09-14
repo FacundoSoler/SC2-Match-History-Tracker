@@ -11,3 +11,4 @@
 /packages/web/node_modules
 /packages/web/public/assets/backup
 /packages/web/dist
+/packages/node_modules

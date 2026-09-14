@@ -8,7 +8,7 @@
             <h2 style="text-align: center;">SC2 Match History Tracker</h2>
 
             <div>
-                <div class="searchBar">  
+                <div class="searchBar">
                     <label for="">BattleNet profile Link:</label>
                     <v-text-field width="200px" v-model="battleNetProfile" placeholder="name, btag#123, [cLaN],"
                         variant="outlined" density="compact" hide-details color="#0d6efd"
@@ -35,12 +35,16 @@
                                 <tr v-for="character in characterList">
                                     <td><img :src="getRegionIcon(character.members.character.region)" width="22px">
                                     </td>
-                                    <td><img :src="setLeagueIcon(character.leagueMax)" width="20px">
+                                    <td><img :src="getLeagueIcon(character.leagueMax)" width="20px">
                                     </td>
                                     <td>{{ character.ratingMax }}</td>
                                     <td>{{ character.totalGamesPlayed }}</td>
-                                    <td>{{ character.currentStats.rating }}</td>
-                                    <td>{{ character.currentStats.gamesPlayed }}</td>
+                                    <td :style="character.currentStats.rating ? '' : 'color: #71706f'">{{
+                                        character.currentStats.rating ? character.currentStats.rating :
+                                        character.previousStats.rating }}</td>
+                                    <td :style="character.currentStats.rating ? '' : 'color: #71706f'">{{
+                                        character.currentStats.gamesPlayed ? character.currentStats.gamesPlayed :
+                                        character.previousStats.gamesPlayed }}</td>
                                     <td>
                                         <router-link style="display: flex; align-items: center; gap: 6px;"
                                             class="matchHistoryLink" :to="{
@@ -71,10 +75,9 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { SeasonDetails } from '../models/seasonDetails';
 import { getRaceIconLink, getRegionIcon } from '../utils/assetsHelper';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { searchCharactersByName, getCurrentSeason } from '../services/characterDetailsService';
+import { getLeagueIcon } from '../utils/formatter';
 
 defineOptions({ name: "CharacterSearch" });
 
@@ -84,62 +87,30 @@ const characterList = ref<any>(null);
 let currentSeason = ref(0);
 
 onMounted(async () => {
-    await getSeasons();
+    const data = await getCurrentSeason();
+    if (data) currentSeason.value = data;
 });
-
-async function getSeasons() {
-    try {
-        const url = `${API_BASE_URL}/seasons`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Error fetching Seasons data');
-
-        const data = await response.json();
-        if (!data || !Array.isArray(data)) throw new Error('Error parsing Seasons data');
-
-        const seasonDetails: SeasonDetails[] = data;
-        currentSeason.value = seasonDetails.sort((a, b) => b.battlenetId - a.battlenetId)[0]?.battlenetId;
-
-    } catch (error: any) {
-        console.error(error);
-    }
-}
 
 async function search() {
     try {
         isLoading.value = true;
-
         if (!battleNetProfile.value) return;
 
-        const url = `${API_BASE_URL}/characterList?query=${battleNetProfile.value}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Error fetching SC2 characters');
-
-        const data = await response.json();
-        if (!data || !Array.isArray(data)) throw new Error('Error parsing SC2 characters response data');
-
-        characterList.value = data;
+        characterList.value = await searchCharactersByName(battleNetProfile.value);
         console.log('characterList', characterList);
+
+        const filteredMatchesList = characterList.value
+            .filter((x: any) => x.currentStats?.rating || x.previousStats?.rating)
+            .filter((x: any) => x.members?.character.tag === battleNetProfile.value)
+            .sort((a: any, b: any) => b.currentStats?.rating - a.currentStats?.rating);
+
+        console.log('filteredMatches', filteredMatchesList);
 
     } catch (error) {
         console.error('Error fetching server API SC2 Pulse Match History', error);
     } finally {
         isLoading.value = false;
     }
-}
-
-function setMatchHistoryLink(characterId: number) {
-    const url = `${API_BASE_URL}/matches?characterId=${characterId}`;
-    return url;
-}
-
-function setLeagueIcon(leagueMax: number) {
-    if (leagueMax === 0) return "/assets/league_bronze.svg";
-    if (leagueMax === 1) return "/assets/league_silver.svg";
-    if (leagueMax === 2) return "/assets/league_gold.svg";
-    if (leagueMax === 3) return "/assets/league_platinum.svg";
-    if (leagueMax === 4) return "/assets/league_diamond.svg";
-    if (leagueMax === 5) return "/assets/league_master.svg";
-    if (leagueMax === 6) return "/assets/league_grandmaster.svg";
 }
 
 </script>
