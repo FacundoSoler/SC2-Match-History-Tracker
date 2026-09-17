@@ -19,6 +19,40 @@ export async function searchCharactersByName(searchParam: string) {
     }
 }
 
+export async function loadCharacterDetails(characterId: number) {
+    const url = `${API_BASE_URL}/characterDetails?characterId=${characterId}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch SC2 Pulse Match History data.');
+
+    let data = await response.json();
+    if (!Array.isArray(data)) throw new Error('Error parsing SC2 Pulse Match History data');
+
+    return data[0];
+}
+
+export async function loadCharacterTeamsData(characterId: number, seasonId: number) {
+    const url = `${API_BASE_URL}/character-teams?characterId=${characterId}&seasonId=${seasonId}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch SC2 Pulse Match History data.');
+
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error('Error parsing SC2 Pulse Match History data');
+
+    return data;
+}
+
+export async function loadMatchHistory(characterId: number) {
+    const url = `${API_BASE_URL}/matches?characterId=${characterId}`;
+
+    const response = await fetch(url);
+    if (!response || !response.ok) throw new Error('Failed to fetch SC2 Pulse Match History data.');
+
+    const data = await response.json();
+    if (!data.result && !Array.isArray(data.result)) throw new Error('Error parsing SC2 Pulse Match History data');
+
+    return data;
+}
+
 export async function getCurrentSeason(): Promise<number | undefined> {
      try {
         const url = `${API_BASE_URL}/seasons`;

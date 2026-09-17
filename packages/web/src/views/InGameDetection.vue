@@ -157,8 +157,6 @@ async function searchCharacterId() {
         characterRating.value = characterDetails.value.currentStats?.rating || characterDetails.value.previousStats?.rating;
     }
 
-    console.log(result);
-
     await requestSC2Data();
 }
 

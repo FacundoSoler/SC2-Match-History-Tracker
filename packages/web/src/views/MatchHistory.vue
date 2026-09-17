@@ -40,19 +40,18 @@
 import { onMounted, ref } from 'vue';
 import CharacterStats from './CharacterStats.vue';
 import MatchHistoryList from './MatchHistoryList.vue';
-import { parsePulseMatches } from '../parsePulseMatches.js';
 import { ICharacterDetails } from '../models/ICharacterDetails';
+import { getCharacterMatches } from '../utils/formatter.js';
+import { loadCharacterDetails, loadCharacterTeamsData, loadMatchHistory } from '../services/characterDetailsService.js';
 
 const props = defineProps<{
-    characterId: string,
+    characterId: number,
     seasonId: number
 }>();
 
 const characterDetails = ref<ICharacterDetails>();
 const characterTeamsData = ref<any[]>();
 const characterMatches = ref<{ matches: any[]; winsVsRace: any } | null>(null);
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 let isLoading = ref(true);
 
@@ -65,11 +64,11 @@ onMounted(async () => {
         let characterDetailsRawData: any;
         [characterDetailsRawData, characterTeamsData.value] = await Promise.all([
             loadCharacterDetails(props.characterId),
-            loadCharacterTeamsData(props.characterId)]);
+            loadCharacterTeamsData(props.characterId, props.seasonId)]);
         getCharacterDetails(characterDetailsRawData);
 
         const rawMatchesData = await loadMatchHistory(props.characterId);
-        getCharacterMatches(rawMatchesData);
+        characterMatches.value = getCharacterMatches(rawMatchesData, characterDetails.value!, props.characterId);
 
         console.timeEnd();
     } catch (error) {
@@ -79,61 +78,9 @@ onMounted(async () => {
     }
 });
 
-async function loadCharacterDetails(characterId: string) {
-    const url = `${API_BASE_URL}/characterDetails?characterId=${characterId}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch SC2 Pulse Match History data.');
-
-    let data = await response.json();
-    if (!Array.isArray(data)) throw new Error('Error parsing SC2 Pulse Match History data');
-
-    return data[0];
-}
-
 function getCharacterDetails(data: any) {
     characterDetails.value = data.members.character;
-}
-
-async function loadCharacterTeamsData(characterId: string) {
-    const url = `${API_BASE_URL}/character-teams?characterId=${characterId}&seasonId=${props.seasonId}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch SC2 Pulse Match History data.');
-
-    const data = await response.json();
-    if (!Array.isArray(data)) throw new Error('Error parsing SC2 Pulse Match History data');
-
-    return data;
-}
-
-async function loadMatchHistory(characterId: string) {
-    const url = `${API_BASE_URL}/matches?characterId=${characterId}`;
-
-    const response = await fetch(url);
-    if (!response || !response.ok) throw new Error('Failed to fetch SC2 Pulse Match History data.');
-
-    const data = await response.json();
-    if (!data.result && !Array.isArray(data.result)) throw new Error('Error parsing SC2 Pulse Match History data');
-
-    return data;
-}
-
-function getCharacterMatches(rawMatchesData: any) {
-    const parsedData = parsePulseMatches(rawMatchesData, { focalName: characterDetails.value?.name });
-
-    const characterName = parsedData.focalPlayer;
-    const matches = parsedData.matches.map((match: any) => ({
-        ...match,
-        players: [...match.players].sort((a, b) =>
-            a.displayName === characterName ? -1 : b.displayName === characterName ? 1 : 0
-        )
-    }));
-
-    characterMatches.value = {
-        matches: matches,
-        winsVsRace: parsedData.winsVsRace
-    };
-
-    console.log('sortedMatches', characterMatches.value);
+    characterDetails.value!.proNickname = data.members?.proNickname;
 }
 
 </script>

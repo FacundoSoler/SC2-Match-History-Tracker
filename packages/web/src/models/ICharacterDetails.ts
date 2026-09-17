@@ -3,4 +3,5 @@ export interface ICharacterDetails {
     battleTag: string;
     tag: string;
     region: string;
+    proNickname: string | null | undefined;
 }

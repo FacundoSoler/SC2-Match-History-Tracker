@@ -27,7 +27,7 @@
                                 && match.players[0].decision === 'WIN',
                             matchLost: match.players[0]?.displayName === props.characterDetails.name
                                 && match.players[0].decision === 'LOSS'
-                        }">{{ setOutcome(match) }}
+                        }">{{ setOutcome(match, props.characterDetails) }}
                         </td>
                         <td>
                             <img
@@ -61,40 +61,20 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import { displayPlayerName, getRaceIcon, showMMRchange } from '../utils/formatter';
+import { onMounted } from 'vue';
+import { displayPlayerName, getRaceIcon, setOutcome, showMMRchange } from '../utils/formatter';
 import { DateFormatter } from '../utils/dateFormatter';
 
 const props = defineProps<{
-    characterId: string,
+    characterId: number,
     characterDetails: any
     characterMatches: any
 }>();
 
 onMounted(() => {
-    console.log('CharDETAILS', props.characterDetails);
-    console.log('Matches', props.characterMatches);
 });
 
 const ABANDONED_GAME_THRESHOLD_IN_SECONDS = 60;
-
-function setOutcome(match: any) {
-    if (match.players[0]?.characterName === props.characterDetails.name) {
-        const mmrChange = showMMRchange(match.players[0]?.ratingChange);
-        if (mmrChange) {
-            return match.players[0]?.decision + ` (` + showMMRchange(match.players[0]?.ratingChange) + ')';
-        } else {
-            return match.players[0]?.decision;
-        }
-    } else {
-        const mmrChange = showMMRchange(match.players[1]?.ratingChange);
-        if (mmrChange) {
-            return match.players[1]?.decision + ` (` + showMMRchange(match.players[1]?.ratingChange) + ')';
-        } else {
-            return match.players[1]?.decision;
-        }
-    }
-}
 
 function isAbandonedGame(match: any) {
     const isAbandonedGame =

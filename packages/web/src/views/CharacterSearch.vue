@@ -97,15 +97,6 @@ async function search() {
         if (!battleNetProfile.value) return;
 
         characterList.value = await searchCharactersByName(battleNetProfile.value);
-        console.log('characterList', characterList);
-
-        const filteredMatchesList = characterList.value
-            .filter((x: any) => x.currentStats?.rating || x.previousStats?.rating)
-            .filter((x: any) => x.members?.character.tag === battleNetProfile.value)
-            .sort((a: any, b: any) => b.currentStats?.rating - a.currentStats?.rating);
-
-        console.log('filteredMatches', filteredMatchesList);
-
     } catch (error) {
         console.error('Error fetching server API SC2 Pulse Match History', error);
     } finally {

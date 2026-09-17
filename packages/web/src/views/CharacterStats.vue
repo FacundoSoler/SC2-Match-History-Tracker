@@ -163,7 +163,7 @@ import { WinrateStats } from '../models/winrateStats';
 import { GameModes } from '../models/gameModes';
 
 const props = defineProps<{
-    characterId: string,
+    characterId: number,
     seasonId: number,
     characterMatches: any,
     characterDetails: any,
@@ -209,14 +209,8 @@ watchEffect(() => {
     try {
         isLoading.value = true;
         getCharacterTeamsStats(props.characterTeamsData);
-        console.log('getCharacterTeamsStats');
-
         getWinsPerRaceStats(props.characterWinsVsRace);
-        console.log('getWinsPerRaceStats');
-
         getAbandonedGamesStats();
-        console.log('getAbandonedGamesStats');
-
     } catch (error) {
         console.error('Error parsing character stats:', error);
     } finally {
@@ -235,8 +229,6 @@ watch(
 );
 
 function animateWinrateCircularProgress() {
-    console.log('animateWinrateCircularProgress started ! ');
-
     if (tickTimer) clearInterval(tickTimer);
 
     currentWinRate.value = 0;
@@ -279,7 +271,6 @@ function getCharacterTeamsStats(characterTeamsData: any) {
         winrateOffRaces.value = offRaces;
 
         targetWinRate.value = mainRace.winratePercentage;
-        console.log('targetWinRate.value changed !');
     }
 }
 
