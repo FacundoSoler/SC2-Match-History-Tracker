@@ -96,3 +96,17 @@ export function setOutcome(match: any, characterDetails: ICharacterDetails) {
     }
 }
 
+export function getOutcomeCSSClass(match: any, characterDetails: ICharacterDetails) {
+    const characterName = characterDetails.proNickname ? characterDetails.proNickname : characterDetails.tag;
+
+    if (match.players[0]?.name === characterName && match.players[0].decision === 'WIN') {
+        return 'matchWon';
+    }
+
+    if (match.players[0]?.name === characterName && match.players[0].decision === 'LOSS') {
+        return 'matchLost';
+    }
+
+    return '';
+}
+

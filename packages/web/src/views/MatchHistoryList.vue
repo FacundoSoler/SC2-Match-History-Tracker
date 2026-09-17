@@ -22,12 +22,7 @@
                     }">
                         <td>{{ match.duration }}</td>
                         <td>{{ match.map }}</td>
-                        <td :class="{
-                            matchWon: match.players[0]?.displayName === props.characterDetails.name
-                                && match.players[0].decision === 'WIN',
-                            matchLost: match.players[0]?.displayName === props.characterDetails.name
-                                && match.players[0].decision === 'LOSS'
-                        }">{{ setOutcome(match, props.characterDetails) }}
+                        <td :class="getOutcomeCSSClass(match, props.characterDetails)">{{ setOutcome(match, props.characterDetails) }}
                         </td>
                         <td>
                             <img
@@ -62,7 +57,7 @@
 
 <script lang="ts" setup>
 import { onMounted } from 'vue';
-import { displayPlayerName, getRaceIcon, setOutcome, showMMRchange } from '../utils/formatter';
+import { displayPlayerName, getOutcomeCSSClass, getRaceIcon, setOutcome } from '../utils/formatter';
 import { DateFormatter } from '../utils/dateFormatter';
 
 const props = defineProps<{
@@ -85,6 +80,7 @@ function isAbandonedGame(match: any) {
 
     return isAbandonedGame;
 }
+
 </script>
 <style scoped>
 .abandoned-game {

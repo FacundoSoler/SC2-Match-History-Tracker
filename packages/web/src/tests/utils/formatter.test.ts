@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { displayPlayerName, getCharacterMatches, showMMRchange } from '../../utils/formatter';
+import { displayPlayerName, getCharacterMatches, getOutcomeCSSClass, setOutcome, showMMRchange } from '../../utils/formatter';
 import { ICharacterDetails } from '../../models/ICharacterDetails';
 
 describe('formatter', () => {
@@ -423,23 +423,162 @@ describe('formatter', () => {
     });
 
     describe('setOutcome', () => {
-        it('', () => {
+        it('Set outcome as LOSS based on player 1 match Decision', () => {
             const mockData = {
-                "matchId": 631750241,
-                "datetime": "2026-09-10T16:38:51Z",
+                "matchId": 632575198,
+                "datetime": "2026-09-17T02:43:07Z",
                 "region": "US",
                 "type": "_1V1",
-                "map": "Rorschach LE",
-                "mapId": 55378,
-                "durationSeconds": 4555,
-                "duration": "75:55",
+                "map": "Sanctuary III LE",
+                "mapId": 55371,
+                "durationSeconds": 172,
+                "duration": "2:52",
                 "players": [
                     {
-                        "name": "Test",
+                        "name": "MVPtcnologic",
                         "displayName": null,
                         "battleTag": null,
-                        "characterName": "Test",
-                        "characterId": 341417840,
+                        "characterName": "MVPtcnologic",
+                        "characterId": 340978136,
+                        "battlenetId": null,
+                        "toon": null,
+                        "race": "Random",
+                        "mmr": null,
+                        "mmrCurrent": null,
+                        "mmrAtMatch": null,
+                        "ratingChange": null,
+                        "decision": "WIN",
+                        "record": null,
+                        "clan": null,
+                        "proNickname": null
+                    },
+                    {
+                        "name": "ack",
+                        "displayName": "ack#347",
+                        "battleTag": "ack5252#1585",
+                        "characterName": "ack#347",
+                        "characterId": 2047310,
+                        "battlenetId": 8718119,
+                        "toon": "1-S2-1-8718119",
+                        "race": "Protoss",
+                        "mmr": 3355,
+                        "mmrCurrent": 3347,
+                        "mmrAtMatch": 3355,
+                        "ratingChange": -42,
+                        "decision": "LOSS",
+                        "record": {
+                            "wins": 13,
+                            "losses": 11,
+                            "games": 24,
+                            "percent": 54.2,
+                            "text": "54.2% (13-11)"
+                        },
+                        "clan": "3sums",
+                        "proNickname": null
+                    }
+                ]
+            };
+
+            const characterDetails = {
+                name: "MVPtcnologic#898",
+                region: "US",
+                tag: "MVPtcnologic",
+                proNickname: null,
+                battleTag: ''
+            } as ICharacterDetails;
+
+            const result = setOutcome(mockData, characterDetails);
+            expect(result).toBe('WIN');
+        });
+
+    });
+
+    describe('getOutcomeCSSClass', () => {
+        it('Set outcome CSS as matchWon based on player 1 match Decision', () => {
+            const mockData = {
+                "matchId": 632575198,
+                "datetime": "2026-09-17T02:43:07Z",
+                "region": "US",
+                "type": "_1V1",
+                "map": "Sanctuary III LE",
+                "mapId": 55371,
+                "durationSeconds": 172,
+                "duration": "2:52",
+                "players": [
+                    {
+                        "name": "MVPtcnologic",
+                        "displayName": null,
+                        "battleTag": null,
+                        "characterName": "MVPtcnologic",
+                        "characterId": 340978136,
+                        "battlenetId": null,
+                        "toon": null,
+                        "race": "Random",
+                        "mmr": null,
+                        "mmrCurrent": null,
+                        "mmrAtMatch": null,
+                        "ratingChange": null,
+                        "decision": "WIN",
+                        "record": null,
+                        "clan": null,
+                        "proNickname": null
+                    },
+                    {
+                        "name": "ack",
+                        "displayName": "ack#347",
+                        "battleTag": "ack5252#1585",
+                        "characterName": "ack#347",
+                        "characterId": 2047310,
+                        "battlenetId": 8718119,
+                        "toon": "1-S2-1-8718119",
+                        "race": "Protoss",
+                        "mmr": 3355,
+                        "mmrCurrent": 3347,
+                        "mmrAtMatch": 3355,
+                        "ratingChange": -42,
+                        "decision": "LOSS",
+                        "record": {
+                            "wins": 13,
+                            "losses": 11,
+                            "games": 24,
+                            "percent": 54.2,
+                            "text": "54.2% (13-11)"
+                        },
+                        "clan": "3sums",
+                        "proNickname": null
+                    }
+                ]
+            };
+
+            const characterDetails = {
+                name: "MVPtcnologic#898",
+                region: "US",
+                tag: "MVPtcnologic",
+                proNickname: null,
+                battleTag: ''
+            } as ICharacterDetails;
+
+            const result = getOutcomeCSSClass(mockData, characterDetails);
+            expect(result).toBe('matchWon');
+        });
+
+        it('Set outcome CSS as matchLost based on player 1 match Decision', () => {
+            const mockData = {
+                "matchId": 632574361,
+                "datetime": "2026-09-17T02:39:32Z",
+                "region": "US",
+                "type": "_1V1",
+                "map": "Rainfall LE",
+                "mapId": 55372,
+                "durationSeconds": 786,
+                "duration": "13:06",
+                "players": [
+                    {
+                        "name": "MVPtcnologic",
+                        "displayName": null,
+                        "battleTag": null,
+                        "characterName": "MVPtcnologic",
+                        "characterId": 340978136,
                         "battlenetId": null,
                         "toon": null,
                         "race": "Random",
@@ -453,33 +592,116 @@ describe('formatter', () => {
                         "proNickname": null
                     },
                     {
-                        "name": "ReAdosS",
-                        "displayName": "ReAdosS#473",
-                        "battleTag": "ReAdosS#1248",
-                        "characterName": "ReAdosS#473",
-                        "characterId": 35851,
-                        "battlenetId": 159230,
-                        "toon": "1-S2-2-159230",
-                        "race": "Terran",
-                        "mmr": 2631,
-                        "mmrCurrent": 2605,
-                        "mmrAtMatch": 2631,
-                        "ratingChange": 22,
+                        "name": "LunaCaNON",
+                        "displayName": "LunaCaNON#496",
+                        "battleTag": "JERRY#34841",
+                        "characterName": "LunaCaNON#496",
+                        "characterId": 320160112,
+                        "battlenetId": 11963191,
+                        "toon": "1-S2-1-11963191",
+                        "race": "Protoss",
+                        "mmr": 3302,
+                        "mmrCurrent": 3481,
+                        "mmrAtMatch": 3302,
+                        "ratingChange": 25,
                         "decision": "WIN",
                         "record": {
-                            "wins": 324,
-                            "losses": 306,
-                            "games": 630,
-                            "percent": 51.4,
-                            "text": "51.4% (324-306)"
+                            "wins": 439,
+                            "losses": 388,
+                            "games": 827,
+                            "percent": 53.1,
+                            "text": "53.1% (439-388)"
                         },
-                        "clan": "ALQ",
+                        "clan": null,
                         "proNickname": null
                     }
                 ]
             };
 
+            const characterDetails = {
+                name: "MVPtcnologic#898",
+                region: "US",
+                tag: "MVPtcnologic",
+                proNickname: null,
+                battleTag: ''
+            } as ICharacterDetails;
 
-        })
+            const result = getOutcomeCSSClass(mockData, characterDetails);
+            expect(result).toBe('matchLost');
+        });
+
+        it('PRO Player - Set outcome CSS as matchLost when match Decision is LOSS', () => {
+            const mockData = {
+                "matchId": 627961102,
+                "datetime": "2026-08-09T15:58:39Z",
+                "region": "US",
+                "type": "_1V1",
+                "map": "Washout LE",
+                "mapId": 55377,
+                "durationSeconds": 1001,
+                "duration": "16:41",
+                "players": [
+                    {
+                        "name": "BerryCruncH",
+                        "displayName": "throatGOAT#656",
+                        "battleTag": "Berry#12296",
+                        "characterName": "throatGOAT#656",
+                        "characterId": 2179926,
+                        "battlenetId": 20087215,
+                        "toon": "1-S2-1-20087215",
+                        "race": "Protoss",
+                        "mmr": 4619,
+                        "mmrCurrent": 4619,
+                        "mmrAtMatch": 4619,
+                        "ratingChange": -9,
+                        "decision": "LOSS",
+                        "record": {
+                            "wins": 38,
+                            "losses": 31,
+                            "games": 69,
+                            "percent": 55.1,
+                            "text": "55.1% (38-31)"
+                        },
+                        "clan": "MANBUN",
+                        "proNickname": "BerryCruncH"
+                    },
+                    {
+                        "name": "Bioice",
+                        "displayName": "Zulrah#592",
+                        "battleTag": "Zulrah#11327",
+                        "characterName": "Zulrah#592",
+                        "characterId": 1025056,
+                        "battlenetId": 8583842,
+                        "toon": "1-S2-1-8583842",
+                        "race": "Zerg",
+                        "mmr": 5149,
+                        "mmrCurrent": 4744,
+                        "mmrAtMatch": 5149,
+                        "ratingChange": 10,
+                        "decision": "WIN",
+                        "record": {
+                            "wins": 226,
+                            "losses": 123,
+                            "games": 349,
+                            "percent": 64.8,
+                            "text": "64.8% (226-123)"
+                        },
+                        "clan": "BUFFW",
+                        "proNickname": "Bioice"
+                    }
+                ]
+            };
+
+            const characterDetails = {
+                name: "tGOAT#656",
+                region: "US",
+                tag: "tGOAT",
+                proNickname: 'BerryCruncH',
+                battleTag: ''
+            } as ICharacterDetails;
+
+            const result = getOutcomeCSSClass(mockData, characterDetails);
+            expect(result).toBe('matchLost');
+        });
     })
 })
