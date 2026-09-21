@@ -2,13 +2,15 @@ import { createRouter, createWebHistory } from "vue-router";
 import CharacterSearch from "../views/CharacterSearch.vue";
 import MatchHistory from "../views/MatchHistory.vue";
 import InGameDetection from "../views/InGameDetection.vue";
+import PrivacyView from '../views/PrivacyView.vue';
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", 
-      name: "search", 
-      component: CharacterSearch 
+    {
+      path: "/",
+      name: "search",
+      component: CharacterSearch
     },
     {
       path: "/matches/:characterId/:seasonId",
@@ -22,6 +24,11 @@ const router = createRouter({
       component: InGameDetection,
       props: true,
     },
+    {
+      path: '/privacy',
+      name: 'Privacy',
+      component: PrivacyView,
+    }
   ],
 });
 

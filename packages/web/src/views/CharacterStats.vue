@@ -26,6 +26,8 @@
             </table>
         </div>
 
+        <hr>
+
         <!-- WIN RATE CIRCULAR PROGRESS STATS -->
         <div class="winrate-block">
             <div class="winrate-block-main-race-container">
@@ -35,8 +37,8 @@
 
                 <v-progress-circular
                     :model-value="currentWinRate"
-                    :size="150"
-                    :width="15"
+                    :size="125"
+                    :width="13"
                     color="primary"
                 >
                     <div
@@ -129,6 +131,8 @@
             </table>
         </div>
 
+        <hr>
+
         <div class="raceStats">
             <table>
                 <caption>Last 20 matches</caption>
@@ -164,7 +168,7 @@
                 </tbody>
             </table>
 
-            <label style="margin-top: 10px;">Total: {{ totalWinsStat }} / {{ totalGamesStat }} games won ({{
+            <label style="margin-top: 0px;">Total: {{ totalWinsStat }} / {{ totalGamesStat }} games won ({{
                 totalWinsWinrateStat }} % winrate)</label>
         </div>
 
@@ -372,6 +376,14 @@ function getWinsPerRaceStats(winsVsRace: any) {
 </script>
 
 <style scoped>
+hr {
+    width: 100%;
+    align-self: stretch;
+    border: 0;
+    border-top: 1px solid #3d4461;
+    margin: 12px 0;
+}
+
 .abandoned-games,
 .raceStats,
 .characterDetailsSection {
@@ -393,7 +405,7 @@ function getWinsPerRaceStats(winsVsRace: any) {
     justify-items: center;
 
     >div {
-        margin-bottom: 50px;
+        margin-bottom: 20px;
     }
 }
 
@@ -509,7 +521,7 @@ function getWinsPerRaceStats(winsVsRace: any) {
 
     .mmrLabel {
         color: rgb(206, 152, 4);
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .MaxMMRLabel {

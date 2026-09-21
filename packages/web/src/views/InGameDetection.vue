@@ -52,6 +52,8 @@
                         {{ characterName }}
                     </div>
 
+                    ||
+
                     <label for="">Account: </label>
                     <div class="characterAccountName">
                         {{ characterAccountBattleTag }}
@@ -270,7 +272,7 @@ form {
     flex: 1;
     flex-direction: column;
     align-items: center;
-    margin: 0px 0px 0px 0px;
+    margin: 5px 0px 0px 0px;
     height: 100%;
     min-height: 0;
 }

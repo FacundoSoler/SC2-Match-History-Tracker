@@ -5,8 +5,6 @@
                 <title>SC2 Match History Tracker</title>
             </div>
 
-            <h2 style="text-align: center;">SC2 Match History Tracker</h2>
-
             <div>
                 <div class="searchBar">
                     <label for="">BattleNet profile Link:</label>
@@ -122,6 +120,7 @@ html {
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    margin-top: 10px;
 }
 
 .sc2-search-input {
@@ -172,4 +171,5 @@ thead td {
     font-weight: bold;
     border-bottom: 1px solid;
 }
+
 </style>

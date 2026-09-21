@@ -34,7 +34,7 @@ const props = defineProps<{
 html {
     background-color: rgba(29, 29, 36, 0.904);
     color: rgb(191, 192, 192);
-    margin: 15px;
+
     overflow-y: hidden !important;
 }
 
