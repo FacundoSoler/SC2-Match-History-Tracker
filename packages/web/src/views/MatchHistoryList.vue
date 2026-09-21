@@ -1,10 +1,11 @@
 <template>
     <div class="matchHistory">
+        <h2 class="panel-title">Match History</h2>
         <div
             v-show="characterMatches"
             class="matchHistoryList"
         >
-            <h1 class="panel-title">Match History</h1>
+            
             <table>
                 <thead>
                     <tr>
@@ -22,7 +23,8 @@
                     }">
                         <td>{{ match.duration }}</td>
                         <td>{{ match.map }}</td>
-                        <td :class="getOutcomeCSSClass(match, props.characterDetails)">{{ setOutcome(match, props.characterDetails) }}
+                        <td :class="getOutcomeCSSClass(match, props.characterDetails)">{{ setOutcome(match,
+                            props.characterDetails) }}
                         </td>
                         <td>
                             <img
@@ -55,7 +57,7 @@
     </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { onMounted } from 'vue';
 import { displayPlayerName, getOutcomeCSSClass, getRaceIcon, setOutcome } from '../utils/formatter';
 import { DateFormatter } from '../utils/dateFormatter';
@@ -83,6 +85,27 @@ function isAbandonedGame(match: any) {
 
 </script>
 <style scoped>
+.matchHistory {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  align-items: center;
+}
+
+.matchHistoryList {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+thead td {
+  position: sticky;
+  top: 0;
+  background-color: #272727;
+  z-index: 1;
+}
+
 .abandoned-game {
     background-color: rgb(109 12 12);
 }

@@ -218,17 +218,19 @@ function parsePulseMatches(payload, options = {}) {
       players: parts.map(({ _names, ...rest }) => rest),
     });
 
-    if (!focalName || parts.length < 2) continue;
-
     const me = parts.find((p) => matchesFocal(p, focalName));
     const opp = parts.find((p) => p !== me);
-    if (!me || !opp) continue;
 
-    const race = opp.race || "Random";
-    if (!vsRace[race]) continue;
+    const OpponentRace = opp ? opp.race : "Random";
+    if (!vsRace[OpponentRace]) continue;
 
-    vsRace[race].total += 1;
-    if (isWin(me.decision)) vsRace[race].wins += 1;
+    vsRace[OpponentRace].total += 1;
+
+    if (me && me.decision && isWin(me.decision)) {
+      vsRace[OpponentRace].wins += 1;
+    } else if (opp && opp.decision && !isWin(opp.decision)) {
+      vsRace[OpponentRace].wins += 1;
+    }
   }
 
   for (const race of Object.keys(vsRace)) {

@@ -1,7 +1,6 @@
 <template>
     <router-link
         class="back-link"
-        v-if="!isLoading"
         to="/"
     >
         <v-icon
@@ -12,76 +11,23 @@
         <span>Character Search</span>
     </router-link>
 
-    <div
-        v-if="!isLoading"
-        class="main-content"
-    >
-        <div class="panels">
-            <character-stats
-                :character-matches="characterMatches?.matches"
-                :character-teams-data="characterTeamsData"
-                :character-wins-vs-race="characterMatches?.winsVsRace"
-                :character-details="characterDetails"
-                :character-id="props.characterId"
-                :season-id="props.seasonId"
-            >
-            </character-stats>
-            <match-history-list
-                :character-details="characterDetails"
-                :character-matches="characterMatches?.matches"
-                :character-id="props.characterId"
-            >
-            </match-history-list>
-        </div>
+    <div class="main-content">
+        <MatchHistoryWrapper
+            :character-id="props.characterId"
+            :season-id="props.seasonId"
+        >
+        </MatchHistoryWrapper>
     </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import CharacterStats from './CharacterStats.vue';
-import MatchHistoryList from './MatchHistoryList.vue';
-import { ICharacterDetails } from '../models/ICharacterDetails';
-import { getCharacterMatches } from '../utils/formatter.js';
-import { loadCharacterDetails, loadCharacterTeamsData, loadMatchHistory } from '../services/characterDetailsService.js';
+import MatchHistoryWrapper from './MatchHistoryWrapper.vue';
 
 const props = defineProps<{
     characterId: number,
     seasonId: number
 }>();
 
-const characterDetails = ref<ICharacterDetails>();
-const characterTeamsData = ref<any[]>();
-const characterMatches = ref<{ matches: any[]; winsVsRace: any } | null>(null);
-
-let isLoading = ref(true);
-
-onMounted(async () => {
-    try {
-        isLoading.value = true;
-
-        console.time();
-
-        let characterDetailsRawData: any;
-        [characterDetailsRawData, characterTeamsData.value] = await Promise.all([
-            loadCharacterDetails(props.characterId),
-            loadCharacterTeamsData(props.characterId, props.seasonId)]);
-        getCharacterDetails(characterDetailsRawData);
-
-        const rawMatchesData = await loadMatchHistory(props.characterId);
-        characterMatches.value = getCharacterMatches(rawMatchesData, characterDetails.value!, props.characterId);
-
-        console.timeEnd();
-    } catch (error) {
-        console.error(error);
-    } finally {
-        isLoading.value = false;
-    }
-});
-
-function getCharacterDetails(data: any) {
-    characterDetails.value = data.members.character;
-    characterDetails.value!.proNickname = data.members?.proNickname;
-}
 
 </script>
 <style>
@@ -92,7 +38,7 @@ html {
     overflow-y: hidden !important;
 }
 
-h1 {
+h2 {
     color: rgb(136, 143, 202);
 }
 
@@ -119,17 +65,8 @@ table {
 .main-content {
     display: flex;
     flex-direction: column;
-    margin-top: 10px;
-
-    .panels {
-        display: flex;
-        justify-content: space-around;
-
-        .panel-title {
-            text-align: center;
-            margin: 0px 0px 25px 0px;
-        }
-    }
+    height: 100%;
+    min-height: 0;
 }
 
 .back-link {

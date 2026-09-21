@@ -1,9 +1,8 @@
 <template>
     <div class="character-stats-panel">
-        <h1 class="panel-title">Character Stats</h1>
+        <h2 class="panel-title">Character Stats</h2>
         <div class="characterDetailsSection">
             <table>
-                <caption>Character details</caption>
                 <thead>
                     <tr>
                         <td>Name</td>
@@ -29,7 +28,7 @@
 
         <!-- WIN RATE CIRCULAR PROGRESS STATS -->
         <div class="winrate-block">
-            <div class="winrate-block-main-race-container ">
+            <div class="winrate-block-main-race-container">
                 <div class="winrate-title">
                     Main Race winrate
                 </div>
@@ -48,6 +47,14 @@
                         <span class="winrate-sub">%</span>
                     </div>
                 </v-progress-circular>
+
+                <div class="mmr-container mainRace">
+                    <label class="mmrLabel">{{ winrateMainRace?.rating }} MMR </label>
+                    <label class="MaxMMRLabel">(MAX: {{ characterDetails.ratingMax }})</label>
+                </div>
+
+                <label>{{ winrateMainRace?.wins }} W / {{ winrateMainRace?.losses }} L</label>
+
             </div>
 
             <div
@@ -58,6 +65,7 @@
 
                 <div class="winrate-block-offraces-items">
                     <div
+                        class="offRaceStat"
                         v-for="stat in winrateOffRaces"
                         :key="stat.raceGames.race"
                     >
@@ -75,6 +83,11 @@
                                 <span class="winrate-sub">%</span>
                             </div>
                         </v-progress-circular>
+
+                        <div class="mmr-container">
+                            <label class="mmrLabel">{{ stat?.rating }} MMR</label>
+                            <label>{{ stat?.wins }} W / {{ stat?.losses }} L</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -143,40 +156,77 @@
                 <tbody>
                     <tr>
                         <td></td>
-                        <td>{{ stats.Protoss }}</td>
-                        <td>{{ stats.Zerg }}</td>
-                        <td>{{ stats.Terran }}</td>
-                        <td>{{ stats.Random }}</td>
+                        <td>{{ stats.Protoss?.text }}</td>
+                        <td>{{ stats.Zerg?.text }}</td>
+                        <td>{{ stats.Terran?.text }}</td>
+                        <td>{{ stats.Random?.text }}</td>
                     </tr>
                 </tbody>
             </table>
+
+            <label style="margin-top: 10px;">Total: {{ totalWinsStat }} / {{ totalGamesStat }} games won ({{
+                totalWinsWinrateStat }} % winrate)</label>
         </div>
 
     </div>
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, ref, watch, watchEffect } from 'vue';
+import { computed, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { getRegionIcon } from '../utils/assetsHelper';
 import { getRaceIcon } from '../utils/formatter';
 import { WinrateStats } from '../models/winrateStats';
 import { GameModes } from '../models/gameModes';
 
 const props = defineProps<{
-    characterId: number,
     seasonId: number,
-    characterMatches: any,
     characterDetails: any,
     characterTeamsData: any,
-    characterWinsVsRace: any
+    characterMatches: CharacterMatches,
 }>();
 
+interface CharacterMatches {
+    matches: any;
+    winsVsRace: any;
+}
+
 let stats: Partial<{
-    Protoss: string,
-    Terran: string,
-    Zerg: string,
-    Random: string
+    Protoss: {
+        wins: number,
+        total: number,
+        text: string
+    },
+    Terran: {
+        wins: number,
+        total: number,
+        text: string
+    },
+    Zerg: {
+        wins: number,
+        total: number,
+        text: string
+    },
+    Random: {
+        wins: number,
+        total: number,
+        text: string
+    }
 }> = {};
+
+const totalWinsStat = computed(() => {
+    const totalWins = stats.Protoss?.wins! + stats.Random?.wins! + stats.Terran?.wins! + stats.Zerg?.wins!;
+    return totalWins;
+});
+
+const totalGamesStat = computed(() => {
+    const totalGames = stats.Protoss?.total! + stats.Random?.total! + stats.Terran?.total! + stats.Zerg?.total!;
+    return totalGames;
+});
+
+const totalWinsWinrateStat = computed(() => {
+    const winrate = Math.round(totalWinsStat.value / (totalGamesStat.value / 100));
+    return winrate;
+})
 
 const ABANDONED_GAME_THRESHOLD_IN_SECONDS = 60;
 const winrateMainRace = ref<WinrateStats>();
@@ -202,14 +252,14 @@ onUnmounted(() => {
 });
 
 watchEffect(() => {
-    if (!props.characterTeamsData || !props.characterWinsVsRace || !props.characterMatches) {
+    if (!props.characterTeamsData || !props.characterMatches.winsVsRace || !props.characterMatches) {
         return;
     }
 
     try {
         isLoading.value = true;
         getCharacterTeamsStats(props.characterTeamsData);
-        getWinsPerRaceStats(props.characterWinsVsRace);
+        getWinsPerRaceStats(props.characterMatches.winsVsRace);
         getAbandonedGamesStats();
     } catch (error) {
         console.error('Error parsing character stats:', error);
@@ -225,7 +275,7 @@ watch(
             animateWinrateCircularProgress();
         }
     },
-    { immediate: true } // Runs immediately if props are already loaded on mount
+    { immediate: true }
 );
 
 function animateWinrateCircularProgress() {
@@ -254,6 +304,9 @@ function getCharacterTeamsStats(characterTeamsData: any) {
             const raceGamesObj = raceMember.members[0]?.raceGames || {};
 
             return new WinrateStats({
+                rating: raceMember.rating,
+                leagueType: raceMember.leagueType,
+                tierType: raceMember.tierType,
                 wins: raceMember.wins,
                 losses: raceMember.losses,
                 raceGames: {
@@ -286,9 +339,9 @@ function showHideAbandonedGamesRow(race: string) {
 }
 
 function getAbandonedGamesStats() {
-    if (!Array.isArray(props.characterMatches)) return;
+    if (!Array.isArray(props.characterMatches.matches)) return;
 
-    for (const match of props.characterMatches) {
+    for (const match of props.characterMatches.matches) {
         // Guard clauses: Check players exist, duration is less than the expected threshold, name matches Character and is a LOSS
         if (!match.players || match.players.length < 2) continue;
         if (typeof match.durationSeconds !== 'number' || match.durationSeconds > ABANDONED_GAME_THRESHOLD_IN_SECONDS) continue;
@@ -310,10 +363,10 @@ function getAbandonedGamesStats() {
 function getWinsPerRaceStats(winsVsRace: any) {
     if (!winsVsRace) return;
 
-    stats.Protoss = winsVsRace.Protoss.text;
-    stats.Zerg = winsVsRace.Zerg.text;
-    stats.Terran = winsVsRace.Terran.text;
-    stats.Random = winsVsRace.Random.text;
+    stats.Protoss = winsVsRace.Protoss;
+    stats.Zerg = winsVsRace.Zerg;
+    stats.Terran = winsVsRace.Terran;
+    stats.Random = winsVsRace.Random;
 }
 
 </script>
@@ -328,13 +381,19 @@ function getWinsPerRaceStats(winsVsRace: any) {
     margin: 15px 0 0 15px;
 }
 
+.raceStats {
+    flex-direction: column;
+}
+
 .character-stats-panel {
     flex: 0 1 auto;
     min-width: 500px;
     max-width: 800px;
+    align-items: center;
+    justify-items: center;
 
-    > div {
-        margin-bottom: 65px;
+    >div {
+        margin-bottom: 50px;
     }
 }
 
@@ -347,11 +406,19 @@ function getWinsPerRaceStats(winsVsRace: any) {
         margin-bottom: 20px;
     }
 
-    .winrate-block-main-race-container {
-        flex: 1;
+    .mmrStat {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
+    }
+
+    .winrate-block-main-race-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
     }
 
     .winrate-block-offraces-container {
@@ -366,6 +433,11 @@ function getWinsPerRaceStats(winsVsRace: any) {
             align-items: center;
             justify-content: center;
             gap: 30px;
+
+            .offRaceStat {
+                display: flex;
+                flex-direction: column;
+            }
         }
     }
 
@@ -416,6 +488,32 @@ function getWinsPerRaceStats(winsVsRace: any) {
     /* Target Vuetify's internal DOM */
     :deep(.v-progress-circular__overlay) {
         transition: none !important;
+    }
+}
+
+.v-progress-circular {
+    margin-bottom: 15px;
+}
+
+.mmr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &.mainRace {
+        flex-direction: row;
+        white-space: nowrap;
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .mmrLabel {
+        color: rgb(206, 152, 4);
+        font-size: 20px;
+    }
+
+    .MaxMMRLabel {
+        color: rgb(216, 106, 43);
     }
 }
 </style>

@@ -26,7 +26,10 @@ import CharacterSearch from './views/CharacterSearch.vue';
 
 .main-content {
   flex: 1;
-  overflow-y: auto;
+  display: flex; 
+  flex-direction: column; 
+  min-height: 0;
+  overflow-y: hidden;
 }
 
 footer {

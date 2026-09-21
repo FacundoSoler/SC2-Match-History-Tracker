@@ -64,6 +64,8 @@ export function getCharacterMatches(rawMatchesData: any, characterDetails: IChar
         winsVsRace: parsedData.winsVsRace
     };
 
+    console.log('winsVSRAce', parsedData.winsVsRace);
+
     return characterMatches;
 }
 

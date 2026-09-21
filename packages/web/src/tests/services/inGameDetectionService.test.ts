@@ -27,7 +27,7 @@ describe('inGameDetectionService', () => {
                 ]
             });
 
-            const result = getOpponentName(mockedData, playerTag);
+            const result = getOpponentName(mockedData.value, playerTag);
             const expected = 'PaN';
             expect(result).toBe(expected);
         });
@@ -55,7 +55,7 @@ describe('inGameDetectionService', () => {
                 ]
             });
 
-            const result = getOpponentName(mockedData, playerTag);
+            const result = getOpponentName(mockedData.value, playerTag);
             const expected = 'PaN';
             expect(result).toBe(expected);
         });
@@ -85,7 +85,7 @@ describe('inGameDetectionService', () => {
                 ]
             });
 
-            const result = getOpponentRace(mockedData, playerTag);
+            const result = getOpponentRace(mockedData.value, playerTag);
             expect(result).toBe('PROTOSS');
         });
 
@@ -112,7 +112,7 @@ describe('inGameDetectionService', () => {
                 ]
             });
 
-            const result = getOpponentRace(mockedData, playerTag);
+            const result = getOpponentRace(mockedData.value, playerTag);
             expect(result).toBe('TERRAN');
         });
 
@@ -139,7 +139,7 @@ describe('inGameDetectionService', () => {
                 ]
             });
 
-            const result = getOpponentRace(mockedData, playerTag);
+            const result = getOpponentRace(mockedData.value, playerTag);
             expect(result).toBe('ZERG');
         });
 
@@ -166,7 +166,7 @@ describe('inGameDetectionService', () => {
                 ]
             });
 
-            const result = getOpponentRace(mockedData, playerTag);
+            const result = getOpponentRace(mockedData.value, playerTag);
             expect(result).toBe('RANDOM');
         });
     });
@@ -225,7 +225,7 @@ describe('inGameDetectionService', () => {
     });
 
     describe('getOpponentCharacterId', () => {
-        it('Retrieves character ID', () => {
+        it('Retrieves character ID of the most suitable match for the current active user character.', () => {
             const mockData = [
                 {
                     "leagueMax": 5,
@@ -245,22 +245,10 @@ describe('inGameDetectionService', () => {
                         "terranGamesPlayed": 24,
                         "protossGamesPlayed": 6,
                         "character": {
-                            "realm": 1,
                             "name": "Nãonãonãonão#583",
                             "id": 3018721,
-                            "accountId": 2698023,
                             "region": "EU",
-                            "battlenetId": 3992967,
                             "tag": "PaN",
-                            "discriminator": 583
-                        },
-                        "account": {
-                            "battleTag": "Pan#1777",
-                            "id": 2698023,
-                            "partition": "GLOBAL",
-                            "hidden": null,
-                            "tag": "Pan",
-                            "discriminator": 1777
                         },
                         "raceGames": {
                             "TERRAN": 24,
@@ -283,27 +271,11 @@ describe('inGameDetectionService', () => {
                         "rank": 31510
                     },
                     "members": {
-                        "terranGamesPlayed": 292,
-                        "protossGamesPlayed": 15,
-                        "zergGamesPlayed": 12,
-                        "randomGamesPlayed": 6,
                         "character": {
-                            "realm": 2,
                             "name": "PaN#833",
                             "id": 2822074,
-                            "accountId": 2698023,
                             "region": "US",
-                            "battlenetId": 1380901,
                             "tag": "Pan",
-                            "discriminator": 833
-                        },
-                        "account": {
-                            "battleTag": "Pan#1777",
-                            "id": 2698023,
-                            "partition": "GLOBAL",
-                            "hidden": null,
-                            "tag": "Pan",
-                            "discriminator": 1777
                         },
                         "raceGames": {
                             "TERRAN": 292,
@@ -328,24 +300,11 @@ describe('inGameDetectionService', () => {
                         "rank": 118712
                     },
                     "members": {
-                        "protossGamesPlayed": 10,
                         "character": {
-                            "realm": 1,
                             "name": "nico#1992",
                             "id": 341379991,
-                            "accountId": 321448175,
                             "region": "US",
-                            "battlenetId": 2608576,
                             "tag": "PaN",
-                            "discriminator": 1992
-                        },
-                        "account": {
-                            "battleTag": "Pan#2661",
-                            "id": 321448175,
-                            "partition": "GLOBAL",
-                            "hidden": null,
-                            "tag": "Pan",
-                            "discriminator": 2661
                         },
                         "raceGames": {
                             "PROTOSS": 10
@@ -367,27 +326,11 @@ describe('inGameDetectionService', () => {
                         "rank": 432432
                     },
                     "members": {
-                        "terranGamesPlayed": 1629,
-                        "protossGamesPlayed": 72,
-                        "zergGamesPlayed": 1177,
-                        "randomGamesPlayed": 529,
                         "character": {
-                            "realm": 1,
                             "name": "PaN#690",
                             "id": 667,
-                            "accountId": 4147432,
                             "region": "US",
-                            "battlenetId": 8165224,
                             "tag": "PaN",
-                            "discriminator": 690
-                        },
-                        "account": {
-                            "battleTag": "PaN#22991",
-                            "id": 4147432,
-                            "partition": "GLOBAL",
-                            "hidden": null,
-                            "tag": "PaN",
-                            "discriminator": 22991
                         },
                         "raceGames": {
                             "TERRAN": 1629,
@@ -412,27 +355,11 @@ describe('inGameDetectionService', () => {
                         "rank": null
                     },
                     "members": {
-                        "terranGamesPlayed": 1629,
-                        "protossGamesPlayed": 72,
-                        "zergGamesPlayed": 1177,
-                        "randomGamesPlayed": 529,
                         "character": {
-                            "realm": 1,
                             "name": "PaN#690",
                             "id": 4147432,
-                            "accountId": 4147432,
                             "region": "US",
-                            "battlenetId": 8165224,
                             "tag": "PaN",
-                            "discriminator": 690
-                        },
-                        "account": {
-                            "battleTag": "PaN#22991",
-                            "id": 4147432,
-                            "partition": "GLOBAL",
-                            "hidden": null,
-                            "tag": "PaN",
-                            "discriminator": 22991
                         },
                         "raceGames": {
                             "TERRAN": 1629,

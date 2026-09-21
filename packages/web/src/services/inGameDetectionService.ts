@@ -1,16 +1,16 @@
 import { type Ref } from 'vue';
 
-export function getOpponentName(sc2Data: Ref<any>, playerTag: string) {
-    if (!sc2Data.value || !sc2Data.value.players) return;
+export function getOpponentName(sc2Data: any, playerTag: string) {
+    if (!sc2Data || !sc2Data.players) return;
 
-    const opponentName: string = sc2Data.value.players.filter((x: any) => x.name !== playerTag)[0]?.name;
+    const opponentName: string = sc2Data.players.filter((x: any) => x.name !== playerTag)[0]?.name;
     return opponentName;
 }
 
-export function getOpponentRace(sc2Data: Ref<any>, playerTag: string) {
-    if (!sc2Data.value || !sc2Data.value.players) return;
+export function getOpponentRace(sc2Data: any, playerTag: string) {
+    if (!sc2Data || !sc2Data.players) return;
 
-    const opponentRace = sc2Data.value.players.filter((x: any) => x.name !== playerTag)[0]?.race;
+    const opponentRace = sc2Data.players.filter((x: any) => x.name !== playerTag)[0]?.race;
 
     if (opponentRace.includes('Terr')) return 'TERRAN';
     if (opponentRace.includes('Prot')) return 'PROTOSS';

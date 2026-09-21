@@ -1,23 +1,28 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.action === "fetchSC2Data") {
 
     try {
-      const gameData = fetch("http://localhost:6119/game")
-        .then((response) => response.json());
+      const gameData = await fetch("http://localhost:6119/game");
+      const UIdata = await fetch("http://localhost:6119/ui");
 
-      const UIdata = fetch("http://localhost:6119/ui")
-        .then((response) => response.json());
+      if (gameData && UIdata) {
+        const gameDataJSON = await gameData.json();
+        const UIdataJSON = await UIdata.json();
 
-      const mappedUIdata = Object.fromEntries(
-        UIdata.activeScreens.map(screen => [screen, true])
-      );
+        const mappedUIdata = Object.fromEntries(
+          UIdataJSON.activeScreens.map(screen => [screen, true])
+        );
 
-      const mappedData = {
-        gameData: gameData,
-        UIdata: mappedUIdata
-      };
+        let mappedData = {
+          gameData: gameDataJSON,
+          UIdata: {
+            activeScreens: mappedUIdata
+          }
+        };
 
-      sendResponse({ success: true, mappedData });
+        sendResponse({ success: true, mappedData });
+      }
+
     } catch (error) {
       sendResponse({ success: false, error: error.message });
     }

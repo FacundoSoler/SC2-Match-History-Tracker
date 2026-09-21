@@ -1,4 +1,7 @@
 export class WinrateStats {
+    rating = 0;
+    leagueType = 0;
+    tierType = 0;
     wins = 0;
     losses = 0;
     raceGames = {
