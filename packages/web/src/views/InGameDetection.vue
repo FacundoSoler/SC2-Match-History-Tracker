@@ -1,99 +1,124 @@
 <template>
     <form @submit.prevent="searchCharacterId()">
-        <div class="main-container">
-            <div :class="getStatusStyle()">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td><label for=""><b>Status:</b> </label></td>
-                            <td>{{ status.statusLabel }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div>
+            <div
+                v-if="!isExtensionInstalled"
+                class="extension-prompt"
+            >
+                <p>Install the companion extension to track live matches:</p>
+
+                <a
+                    href="https://chromewebstore.google.com/detail/nmihlpcdkfbhkcchfjoaadgnfioiphpb"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <img
+                        src="/assets/chrome-store-download-icon.png"
+                        alt="Available in the Chrome Web Store"
+                        class="chrome-badge"
+                    />
+                </a>
             </div>
 
-            <!-- SECTION 1: Local Player Setup -->
-            <fieldset
-                class="section-container player-section"
-                v-if="status.status !== 'OFFLINE'"
+            <div
+                v-else
+                class="main-container"
             >
-                <legend class="section-title">Local Player Setup</legend>
-
-                <div class="searchPanel">
-                    <label>Enter your SC2 battleNetProfile : </label>
-
-                    <v-text-field
-                        width="200px"
-                        v-model="battleNetProfile"
-                        placeholder="name, btag#123, [cLaN],"
-                        variant="outlined"
-                        density="compact"
-                        hide-details
-                        color="#0d6efd"
-                        class="sc2-search-input"
-                    ></v-text-field>
-                    <v-btn
-                        type="submit"
-                        color="#0d6efd"
-                        class="sc2-search-btn"
-                        height="40"
-                        elevation="0"
-                        :loading="isLoading"
-                    >Search
-                    </v-btn>
+                <div :class="getStatusStyle()">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><label for=""><b>Status:</b> </label></td>
+                                <td>{{ status.statusLabel }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div
-                    v-if="characterName"
-                    class="searchResultsPanel"
+                <!-- SECTION 1: Local Player Setup -->
+                <fieldset
+                    class="section-container player-section"
+                    v-if="status.status !== 'OFFLINE'"
                 >
-                    <label>Your character: </label>
-                    <div class="characterName">
-                        {{ characterName }}
+                    <legend class="section-title">Local Player Setup</legend>
+
+                    <div class="searchPanel">
+                        <label>Enter your SC2 battleNetProfile : </label>
+
+                        <v-text-field
+                            width="200px"
+                            v-model="battleNetProfile"
+                            placeholder="name, btag#123, [cLaN],"
+                            variant="outlined"
+                            density="compact"
+                            hide-details
+                            color="#0d6efd"
+                            class="sc2-search-input"
+                        ></v-text-field>
+                        <v-btn
+                            type="submit"
+                            color="#0d6efd"
+                            class="sc2-search-btn"
+                            height="40"
+                            elevation="0"
+                            :loading="isLoading"
+                        >Search
+                        </v-btn>
                     </div>
 
-                    ||
+                    <div
+                        v-if="characterName"
+                        class="searchResultsPanel"
+                    >
+                        <label>Your character: </label>
+                        <div class="characterName">
+                            {{ characterName }}
+                        </div>
 
-                    <label for="">Account: </label>
-                    <div class="characterAccountName">
-                        {{ characterAccountBattleTag }}
+                        ||
+
+                        <label for="">Account: </label>
+                        <div class="characterAccountName">
+                            {{ characterAccountBattleTag }}
+                        </div>
                     </div>
-                </div>
 
-                <v-label
-                    v-if="!isValidBattleNetProfile"
-                    class="errorLabel"
-                >{{ errorLabel }}</v-label>
+                    <v-label
+                        v-if="!isValidBattleNetProfile"
+                        class="errorLabel"
+                    >{{ errorLabel }}</v-label>
 
-            </fieldset>
+                </fieldset>
 
-            <fieldset
-                class="section-container opponent-section"
-                v-if="opponentCharacterId && seasonId"
-            >
-                <legend class="section-title">Opponent data</legend>
-
-                <div
-                    v-if="isMatchHistoryLoading"
-                    class="loader-container"
+                <fieldset
+                    class="section-container opponent-section"
+                    v-if="opponentCharacterId && seasonId"
                 >
-                    <v-progress-circular
-                        indeterminate
-                        color="#0d6efd"
-                        size="64"
-                        width="6"
-                    />
-                </div>
+                    <legend class="section-title">Opponent data</legend>
 
-                <match-history-wrapper
-                    style="margin-top: -30px;"
-                    v-show="!isMatchHistoryLoading"
-                    @loading-change="isMatchHistoryLoading = $event"
-                    :character-id="opponentCharacterId"
-                    :season-id="seasonId"
-                >
-                </match-history-wrapper>
-            </fieldset>
+                    <div
+                        v-if="isMatchHistoryLoading"
+                        class="loader-container"
+                    >
+                        <v-progress-circular
+                            indeterminate
+                            color="#0d6efd"
+                            size="64"
+                            width="6"
+                        />
+                    </div>
+
+                    <match-history-wrapper
+                        style="margin-top: -30px;"
+                        v-show="!isMatchHistoryLoading"
+                        @loading-change="isMatchHistoryLoading = $event"
+                        :character-id="opponentCharacterId"
+                        :season-id="seasonId"
+                    >
+                    </match-history-wrapper>
+                </fieldset>
+            </div>
+
         </div>
     </form>
 </template>
@@ -145,12 +170,13 @@ const status = ref({
 });
 
 const isLoading = ref(false);
+const isExtensionInstalled = ref(false);
 const isMatchHistoryLoading = ref(true);
 
 const errorLabel = ref('');
 const sc2Data = ref<sc2Data>();
 const seasonId = ref<number>();
-const opponentCharacterId = ref<number>();
+const opponentCharacterId = ref<number | null>(null);
 
 const battleNetProfile = ref('');
 const isValidBattleNetProfile = ref(false);
@@ -161,18 +187,120 @@ const characterRating = ref(0);
 const characterAccountBattleTag = ref('');
 const characterDetails = ref<any>();
 
+const isTrackingMatch = ref(false);
+let pollingInterval: ReturnType<typeof setInterval>;
+
 onMounted(async () => {
-    window.addEventListener('message', processIncomingSC2APIData);
+    window.addEventListener('message', handleExtensionMessages);
+
+    window.postMessage({ type: 'CHECK_EXTENSION_INSTALL' }, '*');
 
     seasonId.value = await getCurrentSeason() || 0;
 
-    setInterval(requestSC2Data, 1000);
-    window.postMessage({ type: 'REQUEST_SC2_DATA' }, '*');
+    //await requestSC2Data();
+
+    pollingInterval = setInterval(requestSC2Data, 1000);
 });
 
 onUnmounted(() => {
-    window.removeEventListener('message', processIncomingSC2APIData)
+    clearInterval(pollingInterval!);
+    window.removeEventListener('message', handleExtensionMessages);
 });
+
+const handleExtensionMessages = async (event: MessageEvent) => {
+    if (event.data?.type === "EXTENSION_CONFIRM_INSTALL") {
+        isExtensionInstalled.value = true;
+        return;
+    }
+
+    if (event.data && event.data?.type === 'RECEIVE_SC2_DATA') {
+        const response = event.data.payload;
+        // Safely handle missing response objects or failed backend responses
+        if (!response?.success) {
+            if (status.value.status === SC2Status.OFFLINE) return;
+
+            isTrackingMatch.value = false;
+            setStatus(SC2Status.OFFLINE, 'Waiting for Starcraft 2 to run ...');
+            return;
+        }
+
+        const data = response.mappedData as sc2Data;
+        const game = data.gameData;
+
+        // 1. Extract active screen keys from the mapped object sent by background.js
+        const screensObj = data.UIdata?.activeScreens || {};
+        const activeScreenList = Object.keys(screensObj);
+        const hasActiveScreens = activeScreenList.length > 0;
+
+        // 2. Strict live match verification
+        const isLiveGame =
+            !game.isReplay &&
+            game.players?.length === 2 &&
+            game.players.every((p: any) => p.type === 'user') &&
+            game.players.every((p: any) => p.result === 'Undecided') &&
+            !hasActiveScreens; // An active match has 0 menu screen keys ({})
+
+        if (isLiveGame) {
+            const previousData = sc2Data.value;
+            const prevDisplayTime = previousData?.gameData?.displayTime ?? -1;
+            const isTimerReset = game.displayTime < prevDisplayTime;
+
+            // 3. Trigger search on match start OR game timer restart
+            if (!isTrackingMatch.value || isTimerReset) {
+                isTrackingMatch.value = true;
+
+                // Instantly wipe stale UI data from the previous game
+                opponentCharacterId.value = null;
+
+                setStatus(SC2Status.INGAME, 'Match detected! Fetching opponent data...');
+
+                const opponentName = getOpponentName(game, characterTag.value);
+                console.log(`[SC2 Tracker] New match detected vs. ${opponentName}. Initiating fetch...`);
+
+                try {
+                    const opponentRace = getOpponentRace(game, characterTag.value);
+
+                    if (opponentName) {
+                        const opponentCharacterList = await searchCharactersByName(opponentName);
+
+                        if (opponentCharacterList && opponentCharacterList.length > 0) {
+                            opponentCharacterId.value = await getOpponentCharacterId(
+                                opponentCharacterList,
+                                opponentName,
+                                opponentRace!,
+                                characterRegion.value,
+                                characterRating.value
+                            );
+                            console.log(`[SC2 Tracker] Successfully fetched profile for ${opponentName}.`);
+                        } else {
+                            console.warn(`[SC2 Tracker] Match detected, but no ladder profile was found for ${opponentName}.`);
+                        }
+                    }
+                } catch (error) {
+                    console.error("[SC2 Tracker] Opponent fetch failed:", error);
+                } finally {
+                    setStatus(SC2Status.INGAME, 'In Game');
+                }
+            }
+        } else {
+            // 4. User is in menu, watching replay, or match has finished
+            isTrackingMatch.value = false;
+
+            const isScoreScreen =
+                activeScreenList.some(s => s.includes('ScreenScore')) ||
+                game.players?.some((p: any) => p.result === 'Victory' || p.result === 'Defeat');
+
+            if (isScoreScreen && hasActiveScreens) {
+                setStatus(SC2Status.SCORESCREEN, 'Game finished !');
+            } else {
+                setStatus(SC2Status.ONLINE, 'Starcraft 2 is running. Waiting for a game ...');
+            }
+        }
+
+        sc2Data.value = data;
+        return;
+    }
+}
 
 async function searchCharacterId() {
     isLoading.value = true;
@@ -202,56 +330,22 @@ async function searchCharacterId() {
 function setStatus(statusValue: SC2Status, statusLabel: string) {
     status.value.status = statusValue;
     status.value.statusLabel = `${statusValue} - ${statusLabel}`;
-
-    console.log('setStatus CALLED !', statusValue, statusLabel);
-}
-
-const processIncomingSC2APIData = async (event: any) => {
-    if (!event.data || event.data.type !== 'RECEIVE_SC2_DATA') {
-        return;
-    }
-
-    const response = event.data.payload
-    if (!response.success) {
-        if (status.value.status === SC2Status.OFFLINE) return;
-
-        setStatus(SC2Status.OFFLINE, 'Waiting for Starcraft 2 to run ...');
-        return;
-    }
-
-    const data = response.mappedData as sc2Data;
-    sc2Data.value = data;
-
-    const screens = sc2Data.value?.UIdata.activeScreens;
-    const game = sc2Data.value?.gameData;
-
-    const hasHumanPlayers = game.players?.length > 0 && game.players?.every(x => x.type === 'user');
-    const isNewGame = game.displayTime === 0 && hasHumanPlayers;
-
-    // Match Loading Screen
-    if (isNewGame) {
-        const opponentName = getOpponentName(sc2Data.value.gameData, characterTag.value);
-        const opponentRace = getOpponentRace(sc2Data.value.gameData, characterTag.value);
-        const opponentCharacterList = await searchCharactersByName(opponentName!);
-        opponentCharacterId.value = await getOpponentCharacterId(opponentCharacterList, opponentName!, opponentRace!, characterRegion.value, characterRating.value);
-    }
-    else if (screens[SC2Screens.ScreenScore]) {
-        setStatus(SC2Status.SCORESCREEN, 'Game finished !');
-    }
-    else {
-        setStatus(SC2Status.ONLINE, 'Starcraft 2 is running. Waiting for a game ... ');
-    }
 }
 
 function requestSC2Data() {
     window.postMessage({
         type: "REQUEST_SC2_DATA",
+        customParam: "Test"
     }, "*");
 }
 
 function getStatusStyle() {
     if (status.value.status === SC2Status.ONLINE) {
         return 'statusOnline';
+    }
+
+    if (status.value.status === SC2Status.SCORESCREEN) {
+        return 'statusScoreScreen';
     }
 
     return '';
@@ -275,6 +369,28 @@ form {
     margin: 5px 0px 0px 0px;
     height: 100%;
     min-height: 0;
+}
+
+.extension-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    background: #1e1e24;
+    /* Adjust to match your dark theme */
+    border-radius: 8px;
+}
+
+.chrome-badge {
+    height: 58px;
+    /* Official Google recommended height */
+    width: auto;
+    transition: transform 0.2s ease;
+}
+
+.chrome-badge:hover {
+    transform: scale(1.02);
 }
 
 .section-container {
@@ -354,5 +470,9 @@ td {
 
 .statusOnline {
     background-color: #0d5d08;
+}
+
+.statusScoreScreen {
+    background-color: #4949b7;
 }
 </style>
