@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SC2 Match History Tracker Companion",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Bypasses CORS to fetch live match data from the local StarCraft II client API.",
   
   "icons": {

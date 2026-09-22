@@ -50,7 +50,7 @@
 <style scoped>
 .privacy-container {
   max-width: 800px;
-  margin: 40px auto;
+  margin: 0px auto;
   padding: 20px;
   color: #e0e0e0;
   line-height: 1.6;

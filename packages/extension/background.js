@@ -28,5 +28,14 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     }
 
     return true;
+  } else if (request.action === "checkForUpdate") {
+
+    chrome.runtime.requestUpdateCheck((status) => {
+      console.log('update check', status);
+    });
   }
 });
+
+chrome.runtime.onUpdateAvailable.addListener((details) => {
+  chrome.runtime.reload();
+})
