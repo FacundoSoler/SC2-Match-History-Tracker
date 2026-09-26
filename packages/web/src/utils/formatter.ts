@@ -1,3 +1,4 @@
+import { GameMode } from "../models/gameModes";
 import { ICharacterDetails } from "../models/ICharacterDetails";
 import { parsePulseMatches } from "../parsePulseMatches";
 
@@ -64,8 +65,6 @@ export function getCharacterMatches(rawMatchesData: any, characterDetails: IChar
         winsVsRace: parsedData.winsVsRace
     };
 
-    console.log('winsVSRAce', parsedData.winsVsRace);
-
     return characterMatches;
 }
 
@@ -110,5 +109,12 @@ export function getOutcomeCSSClass(match: any, characterDetails: ICharacterDetai
     }
 
     return '';
+}
+
+export function getLegacyUIDbyRace(gameMode: GameMode, regionId: number, realm: number, battlenetId: number, race: number) {
+    const arrangedTeamType = 0;
+
+    const legacyUID = `${gameMode}-${arrangedTeamType}-${regionId}-${realm}.${battlenetId}.${race}`;
+    return legacyUID;
 }
 

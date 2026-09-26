@@ -1,5 +1,7 @@
 export class WinrateStats {
     rating = 0;
+    maxRating = 0;
+    maxRatingDateString = '';
     leagueType = 0;
     tierType = 0;
     wins = 0;

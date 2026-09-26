@@ -28,6 +28,17 @@ export class DateFormatter {
         }).format(date);
     }
 
+     static formatDateTimeLocalFromTimestamp(timestamp: number, timeZone?: string): string {
+        const date = new Date(timestamp * 1000);
+
+        return new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            ...(timeZone && { timeZone })
+        }).format(date);
+    }
+
     static matchHistoryDateDiff(mhDatetime: Date, currentDatetime: Date) {
         const dateDiffMiliseconds = Math.abs(mhDatetime.getTime() - currentDatetime.getTime());
         const dateDiffMinutes = Math.floor(dateDiffMiliseconds / 1000 / 60);

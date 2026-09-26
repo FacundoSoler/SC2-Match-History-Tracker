@@ -114,6 +114,9 @@
                         @loading-change="isMatchHistoryLoading = $event"
                         :character-id="opponentCharacterId"
                         :season-id="seasonId"
+                        :region="characterRegion"
+                        :battlenet-id="characterBattlenetId"
+                        :realm="characterRealm"
                     >
                     </match-history-wrapper>
                 </fieldset>
@@ -186,6 +189,9 @@ const characterRegion = ref('');
 const characterRating = ref(0);
 const characterAccountBattleTag = ref('');
 const characterDetails = ref<any>();
+
+const characterBattlenetId = ref(0);
+const characterRealm = ref(1);
 
 const isTrackingMatch = ref(false);
 let pollingInterval: ReturnType<typeof setInterval>;
@@ -317,6 +323,9 @@ async function searchCharacterId() {
             characterTag.value = characterDetails.value.members.character.tag;
             characterRegion.value = characterDetails.value.members.character.region;
             characterRating.value = characterDetails.value.currentStats?.rating || characterDetails.value.previousStats?.rating;
+
+            characterBattlenetId.value = characterDetails.value.members.character.battlenetId;
+            characterRealm.value = characterDetails.value.members.character.realm;
         }
 
         await requestSC2Data();

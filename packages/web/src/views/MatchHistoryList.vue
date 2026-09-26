@@ -58,7 +58,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import { displayPlayerName, getOutcomeCSSClass, getRaceIcon, setOutcome } from '../utils/formatter';
 import { DateFormatter } from '../utils/dateFormatter';
 
@@ -68,15 +67,12 @@ const props = defineProps<{
     characterMatches: any
 }>();
 
-onMounted(() => {
-});
-
 const ABANDONED_GAME_THRESHOLD_IN_SECONDS = 60;
 
 function isAbandonedGame(match: any) {
     const isAbandonedGame =
         (match.durationSeconds
-            && match.players[0]?.displayName === props.characterDetails.tag
+            && match.players[0]?.name === props.characterDetails.tag
             && match.durationSeconds < ABANDONED_GAME_THRESHOLD_IN_SECONDS)
         && match.players[0].decision === 'LOSS';
 

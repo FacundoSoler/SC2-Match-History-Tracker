@@ -1,9 +1,11 @@
+import { Realm } from "../models/realms";
+import { Region } from "../models/regions";
 import { SeasonDetails } from "../models/seasonDetails";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export async function searchCharactersByName(searchParam: string) {
-     try {
+    try {
         if (!searchParam) return;
 
         const url = `${API_BASE_URL}/characterList?query=${searchParam}`;
@@ -14,7 +16,7 @@ export async function searchCharactersByName(searchParam: string) {
         if (!data || !Array.isArray(data)) throw new Error('Error parsing SC2 characters response data');
 
         return data;
-    } catch (error:any) {
+    } catch (error: any) {
         throw new Error(`Error fetching server API SC2 Pulse Match History', ${error.message}`);
     }
 }
@@ -53,8 +55,47 @@ export async function loadMatchHistory(characterId: number) {
     return data;
 }
 
+export async function loadCharacterTeamHistories(battlenetId: number, regionId: Region, realm: number) {
+    const url = `${API_BASE_URL}/team-histories?battlenetId=${battlenetId}&regionId=${regionId}&realm=${realm}`;
+
+    const response = await fetch(url);
+    if (!response || !response.ok) throw new Error('Failed to fetch SC2 Pulse Team Histories data.');
+
+    const data = await response.json();
+    return data;
+}
+
+export async function loadMaxRatingsPerRace(battlenetId: number, regionId: Region, realm: number) {
+    const url = `${API_BASE_URL}/team-histories?battlenetId=${battlenetId}&regionId=${regionId}&realm=${realm}`;
+
+    const response = await fetch(url);
+    if (!response || !response.ok) throw new Error('Failed to fetch SC2 Pulse Team Histories data.');
+
+    const data = await response.json();
+
+    const mappedData = data.map((raceHistory: any) => {
+        const mappedResults = raceHistory.history.RATING.map((rating: any, i: any) => ({
+            RatingSet: {
+                rating,
+                timestamp: raceHistory.history.TIMESTAMP[i]
+            }
+        }));
+
+        const sortedResults = mappedResults?.sort((a: any, b: any) => {
+            return b.RatingSet.rating - a.RatingSet.rating
+        });
+
+        return {
+            ...raceHistory.staticData,
+            history : sortedResults
+        };
+    });
+
+    return mappedData;
+}
+
 export async function getCurrentSeason(): Promise<number | undefined> {
-     try {
+    try {
         const url = `${API_BASE_URL}/seasons`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('Error fetching Seasons data');

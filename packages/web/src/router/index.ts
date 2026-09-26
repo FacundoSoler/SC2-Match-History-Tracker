@@ -13,7 +13,7 @@ const router = createRouter({
       component: CharacterSearch
     },
     {
-      path: "/matches/:characterId/:seasonId",
+      path: "/matches/:characterId/:seasonId/:region/:battlenetId/:realm",
       name: "matches",
       component: MatchHistory,
       props: true,

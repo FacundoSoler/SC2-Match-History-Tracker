@@ -15,19 +15,29 @@
         <MatchHistoryWrapper
             :character-id="props.characterId"
             :season-id="props.seasonId"
+            :region="props.region"
+            :battlenet-id="props.battlenetId"
+            :realm="props.realm"
         >
         </MatchHistoryWrapper>
     </div>
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import MatchHistoryWrapper from './MatchHistoryWrapper.vue';
 
 const props = defineProps<{
     characterId: number,
-    seasonId: number
+    seasonId: number,
+    region: string,
+    battlenetId: number,
+    realm: number
 }>();
 
+onMounted(() => {
+    console.log('MatchHistory.vue LOADED. Region:', props.region);
+})
 
 </script>
 <style>

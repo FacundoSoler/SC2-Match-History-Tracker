@@ -47,7 +47,13 @@
                                         <router-link style="display: flex; align-items: center; gap: 6px;"
                                             class="matchHistoryLink" :to="{
                                                 name: 'matches',
-                                                params: { characterId: character.members.character.id, seasonId: currentSeason }
+                                                params: { 
+                                                    characterId: character.members.character.id, 
+                                                    seasonId: currentSeason,
+                                                    region: character.members.character.region,
+                                                    battlenetId: character.members.character.battlenetId,
+                                                    realm: character.members.character.realm
+                                                }
                                             }">
                                             <span style="display: flex;">
                                                 <img style="width: 12px;"

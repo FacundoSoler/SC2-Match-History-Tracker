@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { displayPlayerName, getCharacterMatches, getOutcomeCSSClass, setOutcome, showMMRchange } from '../../utils/formatter';
+import { displayPlayerName, getCharacterMatches, getLegacyUIDbyRace, getOutcomeCSSClass, setOutcome, showMMRchange } from '../../utils/formatter';
 import { ICharacterDetails } from '../../models/ICharacterDetails';
+import { Regions } from '../../models/regions';
+import { Realms } from '../../models/realms';
+import { Races } from '../../models/races';
+import { GameModes } from '../../models/gameModes';
 
 describe('formatter', () => {
     describe('displayPlayerName', () => {
@@ -702,6 +706,22 @@ describe('formatter', () => {
 
             const result = getOutcomeCSSClass(mockData, characterDetails);
             expect(result).toBe('matchLost');
+        });
+    });
+
+    describe('getLegacyUIDbyRace', () => {
+        it('Should retrieve LegacyUID for the US region, first Realm, Terran race.', () => {
+            const result = getLegacyUIDbyRace(GameModes['1v1'], Regions.US, Realms.ONE, 34567890, Races.TERRAN);
+
+            const expected = '201-0-1-1.34567890.1';
+            expect(result).toBe(expected);
+        });
+
+        it('Should retrieve LegacyUID for the US region, first Realm, Terran race.', () => {
+            const result = getLegacyUIDbyRace(GameModes['1v1'], 1, 1, 34567890, 1);
+
+            const expected = '201-0-1-1.34567890.1';
+            expect(result).toBe(expected);
         });
     })
 })

@@ -8,6 +8,7 @@
             :character-teams-data="characterTeamsData"
             :character-details="characterDetails"
             :season-id="props.seasonId"
+            :character-max-ratings="teamHistoriesData"
         >
         </character-stats>
         <match-history-list
@@ -24,7 +25,8 @@ import CharacterStats from './CharacterStats.vue';
 import MatchHistoryList from './MatchHistoryList.vue';
 import { ICharacterDetails } from '../models/ICharacterDetails';
 import { getCharacterMatches } from '../utils/formatter.js';
-import { loadCharacterDetails, loadCharacterTeamsData, loadMatchHistory } from '../services/characterDetailsService.js';
+import { loadCharacterDetails, loadCharacterTeamsData, loadMatchHistory, loadMaxRatingsPerRace } from '../services/characterDetailsService.js';
+import { Regions, type Region, isRegionKey } from '../models/regions.js';
 
 const characterDetails = ref<ICharacterDetails>();
 const characterTeamsData = ref<any[]>();
@@ -32,12 +34,25 @@ const characterMatches = ref<{ matches: any[]; winsVsRace: any } | null>(null);
 
 const props = defineProps<{
     characterId: number,
-    seasonId: number
+    seasonId: number,
+    region: string,
+    battlenetId: number,
+    realm: number
 }>();
 
-const emit = defineEmits(['loading-change']);
+interface TeamHistoryEntry {
+    staticData: { LEGACY_UID: string };
+    history: {
+        RATING: number[];
+        TIMESTAMP: number[];
+    };
+}
 
+const emit = defineEmits(['loading-change']);
 let isLoading = ref(true);
+
+let regionValue: Region | undefined;
+let teamHistoriesData: TeamHistoryEntry[];
 
 onMounted(async () => {
     try {
@@ -46,10 +61,17 @@ onMounted(async () => {
 
         console.time();
 
+        if (isRegionKey(props.region)) {
+            regionValue = Regions[props.region];
+        }
+
         let characterDetailsRawData: any;
-        [characterDetailsRawData, characterTeamsData.value] = await Promise.all([
+        
+        [characterDetailsRawData, characterTeamsData.value, teamHistoriesData] = await Promise.all([
             loadCharacterDetails(props.characterId),
-            loadCharacterTeamsData(props.characterId, props.seasonId)]);
+            loadCharacterTeamsData(props.characterId, props.seasonId),
+            loadMaxRatingsPerRace(props.battlenetId, regionValue!, props.realm)]);
+            
         getCharacterDetails(characterDetailsRawData);
 
         const rawMatchesData = await loadMatchHistory(props.characterId);

@@ -52,11 +52,10 @@
 
                 <div class="mmr-container mainRace">
                     <label class="mmrLabel">{{ winrateMainRace?.rating }} MMR </label>
-                    <label class="MaxMMRLabel">(MAX: {{ characterDetails.ratingMax }})</label>
+                    <label class="MaxMMRLabel">(MAX: {{ winrateMainRace?.maxRating }} - {{
+                        winrateMainRace?.maxRatingDateString }})</label>
                 </div>
-
                 <label>{{ winrateMainRace?.wins }} W / {{ winrateMainRace?.losses }} L</label>
-
             </div>
 
             <div
@@ -64,7 +63,6 @@
                 class="winrate-block-offraces-container"
             >
                 <div class="winrate-title">Off-Races winrates</div>
-
                 <div class="winrate-block-offraces-items">
                     <div
                         class="offRaceStat"
@@ -86,10 +84,12 @@
                             </div>
                         </v-progress-circular>
 
-                        <div class="mmr-container">
-                            <label class="mmrLabel">{{ stat?.rating }} MMR</label>
-                            <label>{{ stat?.wins }} W / {{ stat?.losses }} L</label>
+                        <div class="mmr-container offRace">
+                            <label class="mmrLabel">{{ stat?.rating }} MMR </label>
+                            <label class="MaxMMRLabel">(MAX: {{ stat?.maxRating }} - {{
+                                stat?.maxRatingDateString }})</label>
                         </div>
+                        <label>{{ stat?.wins }} W / {{ stat?.losses }} L</label>
                     </div>
                 </div>
             </div>
@@ -171,22 +171,25 @@
             <label style="margin-top: 0px;">Total: {{ totalWinsStat }} / {{ totalGamesStat }} games won ({{
                 totalWinsWinrateStat }} % winrate)</label>
         </div>
-
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch, watchEffect } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { getRegionIcon } from '../utils/assetsHelper';
-import { getRaceIcon } from '../utils/formatter';
+import { getLegacyUIDbyRace, getRaceIcon } from '../utils/formatter';
 import { WinrateStats } from '../models/winrateStats';
 import { GameModes } from '../models/gameModes';
+import { isRegionKey, Regions } from '../models/regions';
+import { Races } from '../models/races';
+import { DateFormatter } from '../utils/dateFormatter';
 
 const props = defineProps<{
     seasonId: number,
     characterDetails: any,
     characterTeamsData: any,
     characterMatches: CharacterMatches,
+    characterMaxRatings: any
 }>();
 
 interface CharacterMatches {
@@ -250,6 +253,9 @@ const hasAbandonedGames = ref(false);
 const isLoading = ref(false);
 
 let tickTimer: ReturnType<typeof setInterval> | null = null;
+
+onMounted(() => {
+});
 
 onUnmounted(() => {
     if (tickTimer) clearInterval(tickTimer);
@@ -327,7 +333,48 @@ function getCharacterTeamsStats(characterTeamsData: any) {
         winrateMainRace.value = mainRace;
         winrateOffRaces.value = offRaces;
 
+        setMaxRatingDataAllRaces(mainRace, offRaces);
+
         targetWinRate.value = mainRace.winratePercentage;
+    }
+}
+
+function setMaxRatingDataAllRaces(mainRace: WinrateStats, offRaces: WinrateStats[]) {
+    setMaxRatingData(mainRace);
+
+    offRaces.forEach(x => {
+        setMaxRatingData(x);
+    });
+}
+
+function setMaxRatingData(stat: WinrateStats) {
+    try {
+        let regionValue = Regions.US;
+        const region = props.characterDetails.region;
+        if (isRegionKey(region)) {
+            regionValue = Regions[region];
+        }
+
+        const battlenetId = props.characterDetails?.battlenetId;
+        const realm = props.characterDetails?.realm;
+        const race = stat.raceGames.race as keyof typeof Races;
+
+        const legacyUID = getLegacyUIDbyRace(GameModes['1v1'], regionValue, realm, battlenetId, Races[race]);
+        const maxRatingData = props.characterMaxRatings.find((x: any) => x.LEGACY_UID === legacyUID);
+        if (!maxRatingData || !maxRatingData?.history?.[0]) {
+            console.warn(`No max-rating history found for ${legacyUID}`);
+            return;
+        }
+
+        const maxRating = maxRatingData?.history[0].RatingSet?.rating;
+        const maxMMRdateTimestamp = maxRatingData?.history[0].RatingSet?.timestamp;
+
+        stat.maxRating = maxRating;
+        stat.maxRatingDateString = DateFormatter.formatDateTimeLocalFromTimestamp(maxMMRdateTimestamp);
+
+        console.log(`Max Rating: ${stat.maxRating} ${stat.maxRatingDateString}`);
+    } catch (error) {
+        console.error('Error fetching max rating data', error);
     }
 }
 
@@ -449,6 +496,7 @@ hr {
             .offRaceStat {
                 display: flex;
                 flex-direction: column;
+                align-items: center;
             }
         }
     }
@@ -512,8 +560,8 @@ hr {
     flex-direction: column;
     align-items: center;
 
-    &.mainRace {
-        flex-direction: row;
+    &.mainRace, &.offRace {
+        flex-direction: column;
         white-space: nowrap;
         gap: 4px;
         white-space: nowrap;
