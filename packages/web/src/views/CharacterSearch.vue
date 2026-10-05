@@ -156,6 +156,8 @@ html {
     margin-top: 10px;
     display: flex;
     justify-content: center;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .matchHistoryLink {
@@ -171,6 +173,12 @@ th,
 td {
     padding: 4px 16px;
     text-align: left;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    background-color: black;
 }
 
 thead td {
